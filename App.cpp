@@ -10,7 +10,11 @@ App::App()
 	green_label = Color(ColorCode::Black,ColorCode::Green);
 	red_label   = Color(ColorCode::Black,ColorCode::Red);
 	
+	
 	load_config();
+	searching_paths = get_searching_paths();
+	music_folders   = get_music_folders();
+	
 	size = get_terminal_size();
 	max_path_char_number = get_max_path_char_number();
 	set_terminal_size();
@@ -52,4 +56,48 @@ void App::set_terminal_size()
 	SetConsoleScreenBufferSize(terminal,bufferSize);
 	HWND hwnd = FindWindow(NULL,"Dwarf");
 	MoveWindow(hwnd,100,100,size.x,size.y,FALSE);
+}
+
+void App::process_error(const string& error)
+{
+	cout<<error<<endl;
+	write_error_log_file(error);
+	exit(0);
+}
+void App::write_error_log_file(const string& error)
+{
+	ofstream error_log("error.txt");
+	error_log<<error;
+	error_log.close();
+}
+svector App::get_searching_paths()
+{
+	ifstream file;
+	file.open("data/paths.txt");
+	if(!file)
+	{
+		process_error("can not open data/paths.txt!");
+	}
+	
+	svector paths;
+	while(file)
+	{
+		string line;
+		file>>line;
+		if(!line.empty())paths.push_back(line);
+	}
+	file.close();
+	return paths;
+}
+vector<fs::path> App::get_music_folders()
+{
+	vector<fs::path> folders;
+	for(auto& spath: searching_paths)
+	{
+		for(auto& data: fs::recursive_directory_iterator(spath))
+		{
+			folders.push_back(data.path());
+		}
+	}
+	return folders;
 }
