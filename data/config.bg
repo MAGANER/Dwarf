@@ -1,0 +1,32 @@
+(printl "load config...")
+
+#the window size#
+(defvar width 640)
+(defvar height 400)
+(defvar path_char_max 100)
+
+(defvar incorrect_width_too_low (> 0 $width))
+(defvar incorrect_width_too_high (> $width 1000))
+(defvar incorrect_width (and $incorrect_width_too_high $incorrect_width_too_low))
+
+(defvar incorrect_height_too_low (> 0 $height))
+(defvar incorrect_height_too_high (> $height 1000))
+(defvar incorrect_height (and $incorrect_height_too_high $incorrect_height_too_low))
+
+(defvar path_char_max_is_incorrect (> 0 $path_char_max))
+
+(defn die (a)
+  (printl $a)
+  (exit -1)
+)
+
+(
+if (= $path_char_max_is_incorrect true)
+	(die! ("path character max size is incorrect!"))
+)
+(
+ if (or $incorrect_width $incorrect_height)
+	(die! ("size is incorrect!"))
+)
+
+(printl "configurations are loaded!")
