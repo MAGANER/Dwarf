@@ -18,6 +18,9 @@ App::App()
 	size = get_terminal_size();
 	max_path_char_number = get_max_path_char_number();
 	set_terminal_size();
+	system("cls");
+	
+	current_mode = working_modes::MainMenu;
 }
 App::~App()
 {
@@ -26,9 +29,98 @@ App::~App()
 
 void App::run()
 {
-	draw_string("hello",standart,Pos(10,0));
+	while(true)
+	{
+		run_mode();
+		int input = _getch();
+		set_mode(input);
+		system("cls");
+	}
+}
+void App::draw_label()
+{
+	COORD pos;
+	pos.X = 25;
+	pos.Y = 0;
+	draw_string("Dwarf Audio Player",red_label,pos);	
+}
+void App::draw_help()
+{
+	COORD pos;
+	pos.X = 20;
+	pos.Y = 5;
+	svector text = 
+	{
+		"here the list of able commands:",
+		"1 -> to go the main menu",
+		"2 -> to go the default music list",
+		"3 -> to search a track album group",
+		"4 -> to add new path, where music is",
+		"Exit -> to quit the application"
+	};
 	
-	_getch();
+	for(size_t i = 0;i<text.size();++i)
+	{
+		if(i == 1)pos.X = 25;
+		draw_string(text[i],standart,pos);
+		++pos.Y;
+	}
+}
+void App::run_main_menu()
+{
+	draw_label();
+	draw_help();
+}
+void App::run_search_menu()
+{
+	COORD pos;
+	pos.X = 1;
+	pos.Y = 10;
+	draw_string("enter path, where can be found music:",standart,pos);
+	string path = get_path();
+	//TODO:checks path exists
+	
+	bool already_exist = find(searching_paths.begin(),searching_paths.end(),path) != searching_paths.end();
+	if(!already_exist)
+	{
+		add_new_search_paths(path);
+	}
+	current_mode = previos_mode;
+	previos_mode = working_modes::Add;
+}
+string App::get_path()
+{
+	string path;
+	const int size = sizeof(istream)/sizeof(char);
+	char* buffer = new char[size];
+	cin.getline(buffer,size);
+	path = buffer;
+	delete buffer;
+	return path;
+}
+void App::run_mode()
+{
+	switch(current_mode)
+	{
+		case working_modes::MainMenu: run_main_menu(); break;
+		case working_modes::Add: run_search_menu();break;
+	}
+}
+void App::set_mode(int input_code)
+{
+	previos_mode = current_mode;
+	switch(input_code)
+	{
+		case 27:exit(0);break;
+		case 49: current_mode = working_modes::MainMenu;
+		break;
+		case 50: current_mode = working_modes::List;
+		break;
+		case 51: current_mode = working_modes::Search;
+		break;
+		case 52: current_mode = working_modes::Add;
+		break;
+	};
 }
 void App::load_config()
 {
@@ -88,6 +180,25 @@ svector App::get_searching_paths()
 	}
 	file.close();
 	return paths;
+}
+void App::add_new_search_paths(const string& value)
+{
+	svector existing_paths = get_searching_paths();
+	bool exist = find(existing_paths.begin(),existing_paths.end(),value) != existing_paths.end();
+	if(!exist)
+	{
+		ofstream file("data/paths.txt",ios::out | ios::app);
+		if(file)
+		{
+			file<<endl;
+			file<<value;
+			file.close();
+		}
+		else
+		{
+			process_error("cannot open data/paths.txt!");
+		}
+	}
 }
 vector<fs::path> App::get_music_folders()
 {

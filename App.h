@@ -24,6 +24,17 @@ private:
 	
 	svector searching_paths;
 	vector<fs::path> music_folders;
+	
+	enum working_modes
+	{
+		MainMenu,
+		Search,
+		Add,
+		List,
+		Play
+	};
+	int current_mode;
+	int previos_mode;
 public:
 	App();
 	~App();
@@ -46,6 +57,23 @@ private:
 	//error staff 
 	void write_error_log_file(const string& error);
 	void process_error(const string& error);
+	//.
+	
+	//main menu staff
+	void draw_label();
+	void draw_help();
+	void run_main_menu();
+	//.
+	
+	//search menu staff
+	void run_search_menu();
+	string get_path();
+	void add_new_search_paths(const string& value);
+	//.
+	
+	//common staff
+	void run_mode();
+	void set_mode(int input_code);
 	//.
 	
 };
