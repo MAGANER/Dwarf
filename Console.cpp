@@ -51,11 +51,11 @@ Console::~Console()
 	
 }
 
-void Console::draw_string(const string& str, const Color& color, const Pos& pos)
+void Console::draw_string(const string& str, const Color& color, const COORD& pos)
 {
 	HANDLE console = GetStdHandle(STD_OUTPUT_HANDLE);
 	SetConsoleTextAttribute(console, (WORD)((color.background << 4) | color.foreground ));
-	SetCursorPos(pos.x,pos.y);
+	SetConsoleCursorPosition(console,pos);
 	
 	PDWORD written = 0;
 	WriteConsoleA(console,str.c_str(),strlen(str.c_str()),written,NULL);

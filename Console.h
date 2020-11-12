@@ -56,7 +56,7 @@ public:
 	Console();
 	~Console();
 	
-	void draw_string(const string& str, const Color& color, const Pos& pos);
+	void draw_string(const string& str, const Color& color, const COORD& pos);
 
 };
 };
