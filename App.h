@@ -79,7 +79,6 @@ private:
 	//.
 	
 	//list menu staff
-	
 	//.
 	
 	//common staff

@@ -103,8 +103,8 @@ void App::run_mode()
 {
 	switch(current_mode)
 	{
-		case working_modes::MainMenu: run_main_menu(); break;
-		case working_modes::Add: run_search_menu();break;
+		case working_modes::MainMenu: run_main_menu();   break;
+		case working_modes::Add:      run_search_menu(); break;
 	}
 }
 void App::set_mode(int input_code)
@@ -148,7 +148,8 @@ void App::set_terminal_size()
 	COORD bufferSize = {75,75};
 	SetConsoleScreenBufferSize(terminal,bufferSize);
 	HWND hwnd = FindWindow(NULL,"Dwarf");
-	SetWindowPos(hwnd,HWND_TOP,100,100,size.x,size.y,SWP_FRAMECHANGED);
+	const SMALL_RECT win_size ={100,100,size.x,size.y}; 
+	SetConsoleWindowInfo(terminal,TRUE, &win_size);
 }
 
 void App::process_error(const string& error)
