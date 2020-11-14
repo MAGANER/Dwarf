@@ -10,10 +10,11 @@ App::App()
 	green_label = Color(ColorCode::Black,ColorCode::Green);
 	red_label   = Color(ColorCode::Black,ColorCode::Red);
 	
+	able_extensions = {"mp3", "wav"};
 	
 	load_config();
 	searching_paths = get_searching_paths();
-	music_folders   = get_music_folders();
+	music_files   = get_music_files();
 	
 	size = get_terminal_size();
 	max_path_char_number = get_max_path_char_number();
@@ -40,7 +41,7 @@ void App::run()
 void App::draw_label()
 {
 	COORD pos;
-	pos.X = 25;
+	pos.X = 28;
 	pos.Y = 0;
 	draw_string("Dwarf Audio Player",red_label,pos);	
 }
@@ -200,15 +201,25 @@ void App::add_new_search_paths(const string& value)
 		}
 	}
 }
-vector<fs::path> App::get_music_folders()
+svector App::get_music_files()
 {
-	vector<fs::path> folders;
+	svector files;
 	for(auto& spath: searching_paths)
 	{
 		for(auto& data: fs::recursive_directory_iterator(spath))
 		{
-			folders.push_back(data.path());
+			string str = data.path().u8string();
+			int point = str.find(".");
+			if(point != string::npos)
+			{
+				string extension = get_substr(str,point+1,str.size());
+				if(is_extension_able(extension)) files.push_back(str);
+			}
 		}
 	}
-	return folders;
+	return files;
+}
+bool App::is_extension_able(const string& extension)
+{
+	return find(able_extensions.begin(),able_extensions.end(),extension) != able_extensions.end();
 }

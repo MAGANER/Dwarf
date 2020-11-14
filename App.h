@@ -23,7 +23,9 @@ private:
 	int max_path_char_number;
 	
 	svector searching_paths;
-	vector<fs::path> music_folders;
+	svector music_files;
+	
+	svector able_extensions;
 	
 	enum working_modes
 	{
@@ -51,7 +53,8 @@ private:
 	
 	//path staff
 	svector get_searching_paths();
-	vector<fs::path> get_music_folders();
+	svector get_music_files();
+	bool is_extension_able(const string& extension);
 	//.
 	
 	//error staff 
@@ -69,6 +72,10 @@ private:
 	void run_search_menu();
 	string get_path();
 	void add_new_search_paths(const string& value);
+	//.
+	
+	//list menu staff
+	
 	//.
 	
 	//common staff
