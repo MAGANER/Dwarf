@@ -24,6 +24,7 @@ struct TagData
 class TagReader
 {
 private:
+	bool ok;
 	int mp3_tag_size;
 	char* buffer;
 	ifstream audio_file;
@@ -32,6 +33,7 @@ public:
 	TagReader(const string& file);
 	~TagReader();
 	TagData get_tag_info();
+	bool is_ok();
 };
 
 };
