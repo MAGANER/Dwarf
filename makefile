@@ -1,18 +1,21 @@
-CPP      = g++.exe -D__RELEASE__
+CPP      = g++.exe
 INCS     = -I"E:/cpp_projects/DwarfAudioPlayer"
-FLAG     = $(INCS) -std=c++17
+FLAG     = $(INCS) -std=c++17 -g3
 
-objects = main.o app.o console.o
+objects 		  = main.o app.o console.o TagReader.o
 bublegum_objects  = ErrorPrinter.o TypeChecker.o Memory.o VirtualMachine.o
 
 dwarf : $(objects) $(bublegum_objects)
 	$(CPP) -o build/dwarf $(objects) $(bublegum_objects)
 
 app.o : app.cpp 
-	$(CPP) -c app.cpp app.h console.h VirtualMachine/VirtualMachine.h $(FLAG)
+	$(CPP) -c app.cpp app.h console.h TagReader.h VirtualMachine/VirtualMachine.h $(FLAG)
 
 console.o : console.cpp
 	$(CPP) -c console.cpp console.h $(FLAG)
+
+TagReader.o : TagReader.cpp
+	$(CPP) -c TagReader.cpp TagReader.h $(FLAG)
 
 path = VirtualMachine/
 ErrorPrinter.o : $(path)ErrorPrinter.cpp
