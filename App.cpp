@@ -10,11 +10,11 @@ App::App()
 	green_label = Color(ColorCode::Black,ColorCode::Green);
 	red_label   = Color(ColorCode::Black,ColorCode::Red);
 	
-	able_extensions = {"mp3", "wav"};
+	able_extensions = {"mp3"};
 	
 	load_config();
 	searching_paths = get_searching_paths();
-	music_files   = get_music_files();
+	get_music_files();
 	
 	size = get_terminal_size();
 	max_path_char_number = get_max_path_char_number();
@@ -148,7 +148,7 @@ void App::set_terminal_size()
 	COORD bufferSize = {75,75};
 	SetConsoleScreenBufferSize(terminal,bufferSize);
 	HWND hwnd = FindWindow(NULL,"Dwarf");
-	MoveWindow(hwnd,100,100,size.x,size.y,FALSE);
+	SetWindowPos(hwnd,HWND_TOP,100,100,size.x,size.y,SWP_FRAMECHANGED);
 }
 
 void App::process_error(const string& error)
@@ -201,9 +201,8 @@ void App::add_new_search_paths(const string& value)
 		}
 	}
 }
-svector App::get_music_files()
+void App::get_music_files()
 {
-	svector files;
 	for(auto& spath: searching_paths)
 	{
 		for(auto& data: fs::recursive_directory_iterator(spath))
@@ -213,11 +212,20 @@ svector App::get_music_files()
 			if(point != string::npos)
 			{
 				string extension = get_substr(str,point+1,str.size());
-				if(is_extension_able(extension)) files.push_back(str);
+				if(is_extension_able(extension))
+				{
+					TagReader tag(str);
+					if(tag.is_ok())
+					{
+						TagData tags = tag.get_tag_info();
+						MusicData* data = new MusicData(tags.title,tags.artist,tags.album,tags.year);
+						music.push_back(data);
+					}
+					else raw_music.push_back(str);
+				}
 			}
 		}
 	}
-	return files;
 }
 bool App::is_extension_able(const string& extension)
 {

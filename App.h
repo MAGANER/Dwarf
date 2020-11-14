@@ -1,6 +1,8 @@
 #ifndef APP_H
 #define APP_H
 #include"Console.h"
+#include"TagReader.h"
+#include"MusicData.h"
 #include"VirtualMachine/VirtualMachine.h"
 #include<cstdlib>
 #include<filesystem>
@@ -10,9 +12,10 @@
 namespace fs = std::filesystem;
 using namespace Bubblegum;
 using namespace _VirtualMachine;
+using namespace TAG_READER;
 
 namespace Dwarf
-{	
+{
 class App: public Console
 {
 private:
@@ -23,10 +26,11 @@ private:
 	int max_path_char_number;
 	
 	svector searching_paths;
-	svector music_files;
+	vector<MusicData*> music;
+	svector raw_music;
 	
 	svector able_extensions;
-	
+		
 	enum working_modes
 	{
 		MainMenu,
@@ -53,7 +57,7 @@ private:
 	
 	//path staff
 	svector get_searching_paths();
-	svector get_music_files();
+	void get_music_files();
 	bool is_extension_able(const string& extension);
 	//.
 	
