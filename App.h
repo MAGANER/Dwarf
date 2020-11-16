@@ -29,9 +29,10 @@ private:
 	svector searching_paths;
 	vector<TagData*> music;
 	svector raw_music;
+	svector groups;
 	
 	svector able_extensions;
-		
+	
 	enum working_modes
 	{
 		MainMenu,
@@ -47,18 +48,10 @@ private:
 	{
 		Groups = 1,
 		Albums,
-		Genres,
+		Artists,
 	};
-	int current_list_option;
-	
-	enum key_codes
-	{
-		UP   = 72,
-		DOWN = 80,
-		ESCAPE = 27,
-		ENTER  = 13,
-	};
-	
+
+	const int visible_range = 28;
 public:
 	App();
 	~App();
@@ -104,6 +97,7 @@ private:
 	//listing menu staff
 	void run_base_menu_list();
 	void run_list_menu();
+	void run_list_groups();
 	string clear_spaces_at_end(const string& str);
 	//.
 	

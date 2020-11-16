@@ -19,7 +19,7 @@ App::App()
 	max_path_char_number = get_max_path_char_number();
 	set_terminal_size();
 	system("cls");
-	
+
 	current_mode = working_modes::MainMenu;
 }
 App::~App()
@@ -276,7 +276,7 @@ void App::run_base_menu_list()
 		"Choose option to list:",
 		"Groups",
 		"Albums",
-		"Genres",
+		"Artists",
 	};
 	
 	int min = 1;
@@ -304,7 +304,8 @@ void App::run_base_menu_list()
 		if(input == ESCAPE) break;
 		if(input == ENTER)
 		{
-			current_list_option = current;
+			system("cls");
+			if(current == Groups) run_list_groups();
 			break;
 		}
 		
@@ -314,4 +315,47 @@ void App::run_base_menu_list()
 	current_mode = previos_mode;
 	previos_mode = working_modes::List;
 	run_mode();
+}
+void App::run_list_groups()
+{
+	int current_elem = 0;
+	int start_counter = 0;
+	int max_counter   = groups.size()< visible_range?groups.size():visible_range;
+	COORD elem_pos{2,1};
+	while(true)
+	{
+		if(groups.empty())
+		{
+			COORD pos{10,5};
+			draw_string("you have no any group!",standart,pos);
+		}
+		else
+		{
+			for(int i = start_counter;i<max_counter;++i)
+			{
+				string text = to_string(i)+":"+groups[i];
+				if(current_elem == i)
+					draw_string(text,green_label,elem_pos);
+				else draw_string(text,standart,elem_pos);
+				++elem_pos.Y;
+			}
+		}
+		
+		int input = _getch();
+		if(input == ESCAPE) break;
+		if(input == MINUS && current_elem != 0) --current_elem;
+		if(input == PLUS  && current_elem < max_counter-1)++current_elem;
+		if(input == DOWN  && max_counter != groups.size())
+		{
+			++max_counter;
+			++start_counter;
+		}
+		if(input == UP    && start_counter != 0)
+		{
+			--max_counter;
+			--start_counter;
+		}
+
+		elem_pos.Y = 1;
+	}
 }
