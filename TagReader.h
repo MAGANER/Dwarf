@@ -12,14 +12,10 @@ namespace TAG_READER
 {
 struct TagData
 {
-	char tag[3];
-	char title[30];
-	char artist[30];
-	char album [30];
-	char year[4];
-	char comment[30];
-	int genre;
-	
+	string title;
+	string artist;
+	string album;
+	string year;
 };	
 class TagReader
 {
@@ -34,6 +30,8 @@ public:
 	~TagReader();
 	TagData get_tag_info();
 	bool is_ok();
+private:
+	string read_data(ifstream& file);
 };
 
 };
