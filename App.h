@@ -2,12 +2,13 @@
 #define APP_H
 #include"Console.h"
 #include"TagReader.h"
-#include"MusicData.h"
 #include"VirtualMachine/VirtualMachine.h"
 #include<cstdlib>
 #include<filesystem>
 #include<vector>
 #include<fstream>
+#include<clocale>
+#include<algorithm>
 
 namespace fs = std::filesystem;
 using namespace Bubblegum;
@@ -26,7 +27,7 @@ private:
 	int max_path_char_number;
 	
 	svector searching_paths;
-	vector<MusicData*> music;
+	vector<TagData*> music;
 	svector raw_music;
 	
 	svector able_extensions;
@@ -41,6 +42,23 @@ private:
 	};
 	int current_mode;
 	int previos_mode;
+	
+	enum listing_options
+	{
+		Groups = 1,
+		Albums,
+		Genres,
+	};
+	int current_list_option;
+	
+	enum key_codes
+	{
+		UP   = 72,
+		DOWN = 80,
+		ESCAPE = 27,
+		ENTER  = 13,
+	};
+	
 public:
 	App();
 	~App();
@@ -59,6 +77,7 @@ private:
 	svector get_searching_paths();
 	void get_music_files();
 	bool is_extension_able(const string& extension);
+	bool is_file_readeful(TagData tags);
 	//.
 	
 	//error staff 
@@ -72,13 +91,20 @@ private:
 	void run_main_menu();
 	//.
 	
-	//search menu staff
-	void run_search_menu();
+	//adding menu staff
+	void run_add_menu();
 	string get_path();
 	void add_new_search_paths(const string& value);
 	//.
 	
-	//list menu staff
+	//searching menu staff
+	void run_search_menu();
+	//.
+	
+	//listing menu staff
+	void run_base_menu_list();
+	void run_list_menu();
+	string clear_spaces_at_end(const string& str);
 	//.
 	
 	//common staff

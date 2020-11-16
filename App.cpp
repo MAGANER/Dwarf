@@ -15,7 +15,6 @@ App::App()
 	load_config();
 	searching_paths = get_searching_paths();
 	get_music_files();
-	
 	size = get_terminal_size();
 	max_path_char_number = get_max_path_char_number();
 	set_terminal_size();
@@ -72,22 +71,23 @@ void App::run_main_menu()
 	draw_label();
 	draw_help();
 }
-void App::run_search_menu()
+void App::run_add_menu()
 {
 	COORD pos;
 	pos.X = 1;
 	pos.Y = 10;
 	draw_string("enter path, where can be found music:",standart,pos);
 	string path = get_path();
-	//TODO:checks path exists
 	
+	bool exist = fs::exists(path);
 	bool already_exist = find(searching_paths.begin(),searching_paths.end(),path) != searching_paths.end();
-	if(!already_exist)
+	if(!already_exist && exist)
 	{
 		add_new_search_paths(path);
 	}
 	current_mode = previos_mode;
 	previos_mode = working_modes::Add;
+	run_mode();
 }
 string App::get_path()
 {
@@ -101,10 +101,13 @@ string App::get_path()
 }
 void App::run_mode()
 {
+	system("cls");
 	switch(current_mode)
 	{
 		case working_modes::MainMenu: run_main_menu();   break;
-		case working_modes::Add:      run_search_menu(); break;
+		case working_modes::Add:      run_add_menu();    break;
+		case working_modes::Search:   run_search_menu(); break;
+		case working_modes::List:	  run_list_menu();   break;
 	}
 }
 void App::set_mode(int input_code)
@@ -148,7 +151,7 @@ void App::set_terminal_size()
 	COORD bufferSize = {75,75};
 	SetConsoleScreenBufferSize(terminal,bufferSize);
 	HWND hwnd = FindWindow(NULL,"Dwarf");
-	const SMALL_RECT win_size ={100,100,size.x,size.y}; 
+	const SMALL_RECT win_size ={100,100,(short)size.x,(short)size.y}; 
 	SetConsoleWindowInfo(terminal,TRUE, &win_size);
 }
 
@@ -216,10 +219,10 @@ void App::get_music_files()
 				if(is_extension_able(extension))
 				{
 					TagReader tag(str);
-					if(tag.is_ok())
+					TagData tags = tag.get_tag_info();
+					if(tag.is_ok() && is_file_readeful(tags))
 					{
-						TagData tags = tag.get_tag_info();
-						MusicData* data = new MusicData(tags.title,tags.artist,tags.album,tags.year);
+						TagData* data = new TagData(tags);
 						music.push_back(data);
 					}
 					else raw_music.push_back(str);
@@ -231,4 +234,84 @@ void App::get_music_files()
 bool App::is_extension_able(const string& extension)
 {
 	return find(able_extensions.begin(),able_extensions.end(),extension) != able_extensions.end();
+}
+void App::run_search_menu()
+{
+	COORD pos = {5,10};
+	draw_string("look for:",standart, pos);
+	string input = get_path();
+}
+void App::run_list_menu()
+{
+	run_base_menu_list();
+
+}
+string App::clear_spaces_at_end(const string& str)
+{
+	string cleared;
+	bool start_is_found = false;
+	for(int end = str.size();end>-1;--end)
+	{
+		auto curr = str[end];
+		if(!isspace(curr) && !start_is_found) start_is_found = true;
+		if(start_is_found)cleared.push_back(curr);
+	}
+	
+	reverse(cleared.begin(),cleared.end());
+	return cleared;
+}
+bool App::is_file_readeful(TagData tags)
+{
+	//for example uuuuuuuuuuuu is unreadeable
+	string title = tags.title;
+	char first = title[0];
+	int number = count(title.begin(),title.end(),first);
+	return !(number == title.size());
+}
+void App::run_base_menu_list()
+{
+	COORD pos{20,5};
+	svector text = 
+	{
+		"Choose option to list:",
+		"Groups",
+		"Albums",
+		"Genres",
+	};
+	
+	int min = 1;
+	int max = 3;
+	int current = 1;
+	while(true)
+	{
+		for(size_t i = 0;i<text.size();++i)
+		{
+			if(i == 1)pos.X = 25;
+			if(current != i)draw_string(text[i],standart,pos);
+			else draw_string(text[i],green_label,pos);
+			++pos.Y;
+		}
+		
+		int input = _getch();
+		if(input == UP &&  current != min)
+		{
+			--current;
+		}
+		if(input == DOWN && current != max)
+		{ 
+			++current;
+		}
+		if(input == ESCAPE) break;
+		if(input == ENTER)
+		{
+			current_list_option = current;
+			break;
+		}
+		
+		pos.Y = 5;
+		pos.X = 20;
+	}
+	current_mode = previos_mode;
+	previos_mode = working_modes::List;
+	run_mode();
 }
