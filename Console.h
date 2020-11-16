@@ -50,7 +50,16 @@ public:
 		LightRed  = 12,
 		LightMagenta= 13,
 		Yellow = 14,
-		White  = 15
+		White  = 15,
+	};
+	enum key_codes
+	{
+		UP   = 72,
+		DOWN = 80,
+		ESCAPE = 27,
+		ENTER  = 13,
+		MINUS  = 95,
+		PLUS   = 43,
 	};
 public:
 	Console();
