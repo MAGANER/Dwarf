@@ -1,7 +1,6 @@
 #ifndef APP_H
 #define APP_H
 #include"Console.h"
-#include"TagReader.h"
 #include"VirtualMachine/VirtualMachine.h"
 #include<cstdlib>
 #include<filesystem>
@@ -13,7 +12,6 @@
 namespace fs = std::filesystem;
 using namespace Bubblegum;
 using namespace _VirtualMachine;
-using namespace TAG_READER;
 
 namespace Dwarf
 {
@@ -27,7 +25,6 @@ private:
 	int max_path_char_number;
 	
 	svector searching_paths;
-	vector<TagData*> music;
 	svector raw_music;
 	svector groups;
 	
@@ -71,6 +68,7 @@ private:
 	void get_music_files();
 	bool is_extension_able(const string& extension);
 	bool is_file_readeful(TagData tags);
+	string fix_path_slash(const string& path);
 	//.
 	
 	//error staff 

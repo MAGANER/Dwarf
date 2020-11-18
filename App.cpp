@@ -2,7 +2,7 @@
 using namespace Dwarf;
 
 App::App()
-{
+{	
 	system("title Dwarf");
 	system("cls");
 	
@@ -211,21 +211,14 @@ void App::get_music_files()
 	{
 		for(auto& data: fs::recursive_directory_iterator(spath))
 		{
-			string str = data.path().u8string();
+			string str = fix_path_slash(data.path().u8string());
 			int point = str.find(".");
 			if(point != string::npos)
 			{
 				string extension = get_substr(str,point+1,str.size());
 				if(is_extension_able(extension))
 				{
-					TagReader tag(str);
-					TagData tags = tag.get_tag_info();
-					if(tag.is_ok() && is_file_readeful(tags))
-					{
-						TagData* data = new TagData(tags);
-						music.push_back(data);
-					}
-					else raw_music.push_back(str);
+
 				}
 			}
 		}
@@ -358,4 +351,16 @@ void App::run_list_groups()
 
 		elem_pos.Y = 1;
 	}
+}
+string App::fix_path_slash(const string& path)
+{
+	//change \ to /
+	string new_;
+	for(int i = 0;i<path.size();++i)
+	{
+		auto curr = path[i];
+		if(static_cast<int>(curr) != 92)new_+=curr;
+		else new_+="/";
+	}
+	return new_;
 }
