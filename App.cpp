@@ -9,6 +9,7 @@ App::App()
 	standart    = Color(ColorCode::Black,ColorCode::White);
 	green_label = Color(ColorCode::Black,ColorCode::Green);
 	red_label   = Color(ColorCode::Black,ColorCode::Red);
+	empty       = Color(ColorCode::Black,ColorCode::Black);
 	
 	able_extensions = {L"mp3"};
 	
@@ -151,8 +152,7 @@ void App::set_terminal_size()
 	COORD bufferSize = {75,75};
 	SetConsoleScreenBufferSize(terminal,bufferSize);
 	HWND hwnd = FindWindow(NULL,"Dwarf");
-	const SMALL_RECT win_size ={100,100,(short)size.x,(short)size.y}; 
-	SetConsoleWindowInfo(terminal,TRUE, &win_size);
+	MoveWindow(hwnd,100,100,size.x,size.y,false);
 }
 
 void App::process_error(const string& error)
@@ -223,7 +223,7 @@ void App::get_music_files()
 					wstring artist = tag->artist().toWString();
 					wstring title  = tag->title().toWString();
 					wstring album  = tag->album().toWString();
-					string genre  = tag->genre().toCString();
+					wstring genre  = tag->genre().toWString();
 					unsigned int year= tag->year();
 					MusicData* data = new MusicData(artist,title,album,genre,year);
 					music.push_back(data);
@@ -287,8 +287,8 @@ void App::run_base_menu_list()
 			system("cls");
 			if(current == Groups) run_list_groups();
 			if(current == Genres) run_list_genres();
-			if(current == Artists)run_list_artists("");
-			if(current == Albums) run_list_albums("",L"");
+			if(current == Artists)run_list_artists(L"");
+			if(current == Albums) run_list_albums(L"",L"");
 			break;
 		}
 		
@@ -298,6 +298,75 @@ void App::run_base_menu_list()
 	current_mode = previos_mode;
 	previos_mode = working_modes::List;
 	run_mode();
+}
+void App::run_common_list(const wsvector& data,
+						  int& choosen_option,
+						  const string& no_elems_text,
+						  int& current_elem,
+						  int& start_counter,
+						  int& max_counter,
+						  const string& title)
+{
+	COORD title_pos{0,0};
+	draw_string(title,red_label,title_pos);
+	
+	COORD elem_pos{2,1};
+	if(data.empty())
+	{
+		COORD pos{10,5};
+		draw_string(no_elems_text,standart,pos);
+	}
+	else
+	{
+		for(int i = start_counter;i<max_counter;++i)
+		{
+			auto curr = data[i];
+			if(!can_wstring_be_converted_to_std(curr))
+			{
+				if(current_elem == i)
+					draw_string(curr,green_label,elem_pos);
+				else draw_string(curr,standart,elem_pos);
+			}
+			else
+			{
+				string text = convert_wstring_to_std(curr);
+				if(current_elem == i)
+					draw_string(text,green_label,elem_pos);
+				else draw_string(text,standart,elem_pos);					
+			}
+				
+			++elem_pos.Y;
+		}
+	}
+		
+	int input = _getch();
+	if(input == ESCAPE) choosen_option = -2;
+	if(input == MINUS && current_elem != 0) --current_elem;
+	if(input == PLUS  && current_elem < max_counter-1)++current_elem;
+	if(input == DOWN  && max_counter != data.size())
+	{
+		++max_counter;
+		++start_counter;
+	}
+	if(input == UP    && start_counter != 0)
+	{
+		--max_counter;
+		--start_counter;
+	}
+	if(input == ENTER) choosen_option = current_elem;
+
+	elem_pos.Y = 1;
+	
+	//clear all
+	//write this istead of system clearing
+	//because it blinks
+	COORD clear_pos{0,0};
+	for(int i = start_counter;i<max_counter+1;++i)
+	{
+		draw_string(string(75,' '),empty,clear_pos);
+		clear_pos.Y++;
+	}
+	clear_pos.Y = 0;
 }
 void App::run_list_groups()
 {
@@ -344,247 +413,119 @@ void App::run_list_groups()
 }
 void App::run_list_genres()
 {
-	svector genres = get_genre_data_from_music();
-	
+	wsvector genres = get_genre_data_from_music();
+
+	int choosen_option = -1;
+		
 	int current_elem = 0;
 	int start_counter = 0;
 	int max_counter   = genres.size()< visible_range?genres.size():visible_range;
-	COORD elem_pos{2,1};
-	while(true)
-	{
-		if(genres.empty())
-		{
-			COORD pos{10,5};
-			draw_string("there is no any genre data!",standart,pos);
-		}
-		else
-		{
-			for(int i = start_counter;i<max_counter;++i)
-			{
-				string text = genres[i];
-				if(current_elem == i)
-					draw_string(text,green_label,elem_pos);
-				else draw_string(text,standart,elem_pos);
-				++elem_pos.Y;
-			}
-		}
-		
-		int input = _getch();
-		if(input == ESCAPE) break;
-		if(input == MINUS && current_elem != 0) --current_elem;
-		if(input == PLUS  && current_elem < max_counter-1)++current_elem;
-		if(input == DOWN  && max_counter != genres.size())
-		{
-			++max_counter;
-			++start_counter;
-		}
-		if(input == UP    && start_counter != 0)
-		{
-			--max_counter;
-			--start_counter;
-		}
-		if(input == ENTER)
-		{
-			system("cls");
-			choose_what_to_run(genres[current_elem]);
-		}
-
-		elem_pos.Y = 1;
-		system("cls");
-	}
-}
-void App::run_list_artists(const string& genre)
-{
-	wsvector artists = get_artists_data_from_music(genre);
 	
-	int current_elem = 0;
-	int start_counter = 0;
-	int max_counter   = artists.size()< visible_range? artists.size():visible_range;
-	COORD elem_pos{2,1};
 	while(true)
 	{
-		if(artists.empty())
-		{
-			COORD pos{10,5};
-			draw_string("there is no any artist!",standart,pos);
-		}
-		else
-		{
-			for(int i = start_counter;i<max_counter;++i)
-			{
-				if(!can_wstring_be_converted_to_std(artists[i]))
-				{
-					wstring text = artists[i];
-					if(current_elem == i)
-						draw_string(text,green_label,elem_pos);
-					else draw_string(text,standart,elem_pos);
-				}
-				else
-				{
-					string text = convert_wstring_to_std(artists[i]);
-					if(current_elem == i)
-						draw_string(text,green_label,elem_pos);
-					else draw_string(text,standart,elem_pos);					
-				}
-				
-				++elem_pos.Y;
-			}
-		}
-		
-		int input = _getch();
-		if(input == ESCAPE) break;
-		if(input == MINUS && current_elem != 0) --current_elem;
-		if(input == PLUS  && current_elem < max_counter-1)++current_elem;
-		if(input == DOWN  && max_counter != artists.size())
-		{
-			++max_counter;
-			++start_counter;
-		}
-		if(input == UP    && start_counter != 0)
-		{
-			--max_counter;
-			--start_counter;
-		}
-
-		elem_pos.Y = 1;
-		system("cls");
+		run_common_list(genres,
+						choosen_option,
+						"there is no any genre data",
+						current_elem,
+						start_counter,
+						max_counter,
+						"Genres:");
+		if(choosen_option == -2) break;
+		if(choosen_option > 0)
+			choose_what_to_run_from_genre_menu(genres[choosen_option]);
 	}
 }
-void App::run_list_albums(const string& genre,const wstring& artist)
+void App::run_list_artists(const wstring& genre)
+{
+	wsvector artists   = get_artists_data_from_music(genre);
+	int max_counter    = artists.size() < visible_range? artists.size():visible_range;
+	int choosen_option = -1;
+	
+	int start_counter = 0;
+	int current_elem  = 0;
+	
+	while(true)
+	{
+		run_common_list(artists,
+						choosen_option,
+						"there is no any artist!",
+						current_elem,
+						start_counter,
+						max_counter,
+						"Artists:");
+		if(choosen_option == -2) break;
+	}
+}
+void App::run_list_albums(const wstring& genre,const wstring& artist)
 {
 	wsvector albums = get_album_data_from_music(artist,genre);
 	
+	int choosen_option = -1;
 	int current_elem = 0;
 	int start_counter = 0;
 	int max_counter   = albums.size()< visible_range? albums.size():visible_range;
-	COORD elem_pos{2,1};
+	
 	while(true)
 	{
-		if(albums.empty())
-		{
-			COORD pos{10,5};
-			draw_string("there is no any artist!",standart,pos);
-		}
-		else
-		{
-			for(int i = start_counter;i<max_counter;++i)
-			{
-				if(!can_wstring_be_converted_to_std(albums[i]))
-				{
-					wstring text = albums[i];
-					if(current_elem == i)
-						draw_string(text,green_label,elem_pos);
-					else draw_string(text,standart,elem_pos);
-				}
-				else
-				{
-					string text = convert_wstring_to_std(albums[i]);
-					if(current_elem == i)
-						draw_string(text,green_label,elem_pos);
-					else draw_string(text,standart,elem_pos);					
-				}
-				
-				++elem_pos.Y;
-			}
-		}
-		
-		int input = _getch();
-		if(input == ESCAPE) break;
-		if(input == MINUS && current_elem != 0) --current_elem;
-		if(input == PLUS  && current_elem < max_counter-1)++current_elem;
-		if(input == DOWN  && max_counter != albums.size())
-		{
-			++max_counter;
-			++start_counter;
-		}
-		if(input == UP    && start_counter != 0)
-		{
-			--max_counter;
-			--start_counter;
-		}
-
-		elem_pos.Y = 1;
-		system("cls");
-	}	
+		run_common_list(albums,
+						choosen_option,
+						"there is no any album!",
+						current_elem,
+						start_counter,
+						max_counter,
+						"Albums:");
+		if(choosen_option == -2) break;
+	}
 }
-void App::run_list_titles(const string& genre,const wstring& artist)
+void App::run_list_titles(const wstring& genre,const wstring& artist)
 {
 	wsvector titles = get_title_data_from_music(artist,genre);
 	
+	int choosen_option = -1;
 	int current_elem = 0;
 	int start_counter = 0;
 	int max_counter   = titles.size()< visible_range? titles.size():visible_range;
-	COORD elem_pos{2,1};
+	
 	while(true)
 	{
-		if(titles.empty())
-		{
-			COORD pos{10,5};
-			draw_string("there is no any song!",standart,pos);
-		}
-		else
-		{
-			for(int i = start_counter;i<max_counter;++i)
-			{
-				if(!can_wstring_be_converted_to_std(titles[i]))
-				{
-					wstring text = titles[i];
-					if(current_elem == i)
-						draw_string(text,green_label,elem_pos);
-					else draw_string(text,standart,elem_pos);
-				}
-				else
-				{
-					string text = convert_wstring_to_std(titles[i]);
-					if(current_elem == i)
-						draw_string(text,green_label,elem_pos);
-					else draw_string(text,standart,elem_pos);					
-				}
-				
-				++elem_pos.Y;
-			}
-		}
-		
-		int input = _getch();
-		if(input == ESCAPE) break;
-		if(input == MINUS && current_elem != 0) --current_elem;
-		if(input == PLUS  && current_elem < max_counter-1)++current_elem;
-		if(input == DOWN  && max_counter != titles.size())
-		{
-			++max_counter;
-			++start_counter;
-		}
-		if(input == UP    && start_counter != 0)
-		{
-			--max_counter;
-			--start_counter;
-		}
-
-		elem_pos.Y = 1;
-		system("cls");
+		run_common_list(titles,
+						choosen_option,
+						"there is no any composition!",
+						current_elem,
+						start_counter,
+						max_counter,
+						"Compositions:");
+		if(choosen_option == -2) break;
 	}
 }
-void App::choose_what_to_run(const string& genre_name)
+void App::run_common_choosing_list(const wsvector& text,
+								   int& min,
+								   int& max,
+								   int& current,
+								   int& choosen_option)
 {
 	COORD pos{20,5};
-	svector text = 
-	{
-		"What you want to see from "+genre_name+":",
-		"Arists",
-		"Albums",
-		"Compositions",
-	};
-	
-	int min = 1;
-	int max = 3;
-	int current = 1;
 	while(true)
 	{
 		for(size_t i = 0;i<text.size();++i)
 		{
+			auto curr = text[i];
+			
 			if(i == 1)pos.X = 25;
-			if(current != i)draw_string(text[i],standart,pos);
-			else draw_string(text[i],green_label,pos);
+			if(!can_wstring_be_converted_to_std(curr))
+			{
+				if(current == i)
+					draw_string(curr,green_label,pos);
+				else draw_string(curr,standart,pos);
+			}
+			else
+			{
+				string text = convert_wstring_to_std(curr);
+				if(current == i)
+					draw_string(text,green_label,pos);
+				else draw_string(text,standart,pos);					
+			}
+				
 			++pos.Y;
 		}
 		
@@ -597,19 +538,47 @@ void App::choose_what_to_run(const string& genre_name)
 		{ 
 			++current;
 		}
-		if(input == ESCAPE) break;
+		if(input == ESCAPE) 
+		{
+			choosen_option = -2;
+			break;
+		}
 		if(input == ENTER)
 		{
 			system("cls");
-			if(current == 1) run_list_artists(genre_name);
-			if(current == 2) run_list_albums(genre_name,L"");
-			if(current == 3) run_list_titles(genre_name,L"");
+			choosen_option = current;
 			break;
 		}
 		
 		pos.Y = 5;
 		pos.X = 20;
+	}	
+}
+								  
+								  
+void App::choose_what_to_run_from_genre_menu(const wstring& genre_name)
+{
+	wsvector text = 
+	{
+		L"What you want to see from "+genre_name+L":",
+		L"Artists",
+		L"Albums",
+		L"Compositions",
+	};
+	int choosen_option = -1;
+	
+	int min = 1;
+	int max = 3;
+	int current = 1;
+	while(true)
+	{
+		run_common_choosing_list(text,min,max,current,choosen_option);
+		if(choosen_option == 1) run_list_artists(genre_name);
+		if(choosen_option == 2) run_list_albums(genre_name,L"");
+		if(choosen_option == 3) run_list_titles(genre_name,L"");
+		if(choosen_option == -2) break;
 	}
+	system("cls");
 }
 wstring App::fix_path_slash(const wstring& path)
 {
@@ -623,9 +592,9 @@ wstring App::fix_path_slash(const wstring& path)
 	}
 	return new_;
 }
-svector App::get_genre_data_from_music()
+wsvector App::get_genre_data_from_music()
 {
-	svector data;
+	wsvector data;
 	for(auto& m:music)
 	{
 		bool already_added = find(data.begin(),data.end(),m->genre) != data.end();
@@ -634,7 +603,7 @@ svector App::get_genre_data_from_music()
 	data.erase(--data.end());
 	return data;
 }
-wsvector App::get_artists_data_from_music(const string& genre)
+wsvector App::get_artists_data_from_music(const wstring& genre)
 {
 	wsvector data;
 	for(auto& m:music)
@@ -645,7 +614,7 @@ wsvector App::get_artists_data_from_music(const string& genre)
 	}
 	return data;
 }
-wsvector App::get_album_data_from_music(const wstring& artist, const string& genre)
+wsvector App::get_album_data_from_music(const wstring& artist, const wstring& genre)
 {
 	wsvector data;
 	for(auto& m:music)
@@ -661,7 +630,7 @@ wsvector App::get_album_data_from_music(const wstring& artist, const string& gen
 	}
 	return data;
 }
-wsvector App::get_title_data_from_music(const wstring& artist, const string& genre)
+wsvector App::get_title_data_from_music(const wstring& artist, const wstring& genre)
 {
 	wsvector data;
 	for(auto& m:music)

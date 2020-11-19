@@ -23,7 +23,7 @@ typedef vector<wstring> wsvector;
 class App: public Console
 {
 private:
-	Color standart, green_label, red_label;
+	Color standart, green_label, red_label, empty;
 	VirtualMachine machine;
 	
 	Pos size;
@@ -106,23 +106,37 @@ private:
 	//.
 	
 	//listing menu staff	
+	void run_common_list(const wsvector& data,
+						 int& choosen_option,
+						 const string& no_elems_text,
+						 int& current_elem,
+						 int& start_counter,
+						 int& max_counter,
+						 const string& title);
+						 
+	void run_common_choosing_list(const wsvector& text,
+								  int& min,
+								  int& max,
+								  int& current,
+								  int& choosen_option);
+	
 	void run_base_menu_list();
 	void run_list_menu();
 	void run_list_groups();
 	
 	void run_list_genres();
-	void choose_what_to_run(const string& genre_name);
+	void choose_what_to_run_from_genre_menu(const wstring& genre_name);
 	
-	void run_list_artists(const string& genre);
-	void run_list_albums(const string& genre,const wstring& artist);
-	void run_list_titles(const string& genre,const wstring& artist);
+	void run_list_artists(const wstring& genre);
+	void run_list_albums(const wstring& genre,const wstring& artist);
+	void run_list_titles(const wstring& genre,const wstring& artist);
 	//.
 	
 	//
-	svector get_genre_data_from_music();
-	wsvector get_artists_data_from_music(const string& genre);
-	wsvector get_album_data_from_music(const wstring& artist, const string& genre);
-	wsvector get_title_data_from_music(const wstring& artist, const string& genre);
+	wsvector get_genre_data_from_music();
+	wsvector get_artists_data_from_music(const wstring& genre);
+	wsvector get_album_data_from_music(const wstring& artist, const wstring& genre);
+	wsvector get_title_data_from_music(const wstring& artist, const wstring& genre);
 	//.
 	
 	//common staff
