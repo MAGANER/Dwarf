@@ -635,14 +635,14 @@ wsvector App::get_title_data_from_music(const wstring& artist, const wstring& ge
 	wsvector data;
 	for(auto& m:music)
 	{
-		bool already_added = find(data.begin(),data.end(),m->title) != data.end();
-		if(!already_added)
+		bool is_new = find(data.begin(),data.end(),m->title) == data.end();
+		if(is_new)
 		{
 			
-			if(artist.empty()      && genre.empty())     data.push_back(m->title);
-			else if(genre == m->genre) data.push_back(m->title);
-			else if(genre.empty()  && artist== m->artist)data.push_back(m->title);
-			else if(genre == m->genre && artist == m->artist) data.push_back(m->title);
+			if(artist.empty()      && genre.empty())       data.push_back(m->title);
+			if(genre == m->genre   && artist.empty())      data.push_back(m->title);
+			if(genre.empty()       && artist== m->artist)  data.push_back(m->title);
+			if(genre == m->genre   && artist == m->artist) data.push_back(m->title);
 		}
 	}
 	return data;
