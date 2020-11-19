@@ -6,13 +6,12 @@ namespace Dwarf
 {
 struct MusicData
 {
-	wstring artist, title, album;
-	string genre;
+	wstring artist, title, album, genre;
 	unsigned int year;
 	MusicData(const wstring& artist,
 			  const wstring& title,
 			  const wstring& album,
-			  const string& genre,
+			  const wstring& genre,
 			  unsigned int year)
 	{
 		this->artist = artist;
