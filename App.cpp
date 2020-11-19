@@ -10,7 +10,7 @@ App::App()
 	green_label = Color(ColorCode::Black,ColorCode::Green);
 	red_label   = Color(ColorCode::Black,ColorCode::Red);
 	
-	able_extensions = {"mp3"};
+	able_extensions = {L"mp3"};
 	
 	load_config();
 	searching_paths = get_searching_paths();
@@ -211,20 +211,28 @@ void App::get_music_files()
 	{
 		for(auto& data: fs::recursive_directory_iterator(spath))
 		{
-			string str = fix_path_slash(data.path().u8string());
-			int point = str.find(".");
-			if(point != string::npos)
+			wstring str = fix_path_slash(data.path().wstring());
+			int point = str.find(L".");
+			if(point != wstring::npos)
 			{
-				string extension = get_substr(str,point+1,str.size());
+				wstring extension = get_substr(str,point+1,str.size());
 				if(is_extension_able(extension))
 				{
-
+					TagLib::FileRef f(str.c_str());
+					TagLib::Tag *tag = f.tag();
+					wstring artist = tag->artist().toWString();
+					wstring title  = tag->title().toWString();
+					wstring album  = tag->album().toWString();
+					string genre  = tag->genre().toCString();
+					unsigned int year= tag->year();
+					MusicData* data = new MusicData(artist,title,album,genre,year);
+					music.push_back(data);
 				}
 			}
 		}
 	}
 }
-bool App::is_extension_able(const string& extension)
+bool App::is_extension_able(const wstring& extension)
 {
 	return find(able_extensions.begin(),able_extensions.end(),extension) != able_extensions.end();
 }
@@ -239,28 +247,6 @@ void App::run_list_menu()
 	run_base_menu_list();
 
 }
-string App::clear_spaces_at_end(const string& str)
-{
-	string cleared;
-	bool start_is_found = false;
-	for(int end = str.size();end>-1;--end)
-	{
-		auto curr = str[end];
-		if(!isspace(curr) && !start_is_found) start_is_found = true;
-		if(start_is_found)cleared.push_back(curr);
-	}
-	
-	reverse(cleared.begin(),cleared.end());
-	return cleared;
-}
-bool App::is_file_readeful(TagData tags)
-{
-	//for example uuuuuuuuuuuu is unreadeable
-	string title = tags.title;
-	char first = title[0];
-	int number = count(title.begin(),title.end(),first);
-	return !(number == title.size());
-}
 void App::run_base_menu_list()
 {
 	COORD pos{20,5};
@@ -270,10 +256,11 @@ void App::run_base_menu_list()
 		"Groups",
 		"Albums",
 		"Artists",
+		"Genres",
 	};
 	
 	int min = 1;
-	int max = 3;
+	int max = 4;
 	int current = 1;
 	while(true)
 	{
@@ -299,6 +286,7 @@ void App::run_base_menu_list()
 		{
 			system("cls");
 			if(current == Groups) run_list_groups();
+			if(current == Genres) run_list_genres();
 			break;
 		}
 		
@@ -352,15 +340,84 @@ void App::run_list_groups()
 		elem_pos.Y = 1;
 	}
 }
-string App::fix_path_slash(const string& path)
+void App::run_list_genres()
+{
+	svector genres = get_genre_data_from_music();
+	unique(genres.begin(),genres.end());
+	
+	int current_elem = 0;
+	int start_counter = 0;
+	int max_counter   = genres.size()< visible_range?genres.size():visible_range;
+	COORD elem_pos{2,1};
+	while(true)
+	{
+		if(genres.empty())
+		{
+			COORD pos{10,5};
+			draw_string("there is no any genre data!",standart,pos);
+		}
+		else
+		{
+			for(int i = start_counter;i<max_counter;++i)
+			{
+				string text = genres[i];
+				if(current_elem == i)
+					draw_string(text,green_label,elem_pos);
+				else draw_string(text,standart,elem_pos);
+				++elem_pos.Y;
+			}
+		}
+		
+		int input = _getch();
+		if(input == ESCAPE) break;
+		if(input == MINUS && current_elem != 0) --current_elem;
+		if(input == PLUS  && current_elem < max_counter-1)++current_elem;
+		if(input == DOWN  && max_counter != genres.size())
+		{
+			++max_counter;
+			++start_counter;
+		}
+		if(input == UP    && start_counter != 0)
+		{
+			--max_counter;
+			--start_counter;
+		}
+
+		elem_pos.Y = 1;
+		system("cls");
+	}
+}
+wstring App::fix_path_slash(const wstring& path)
 {
 	//change \ to /
-	string new_;
+	wstring new_;
 	for(int i = 0;i<path.size();++i)
 	{
 		auto curr = path[i];
 		if(static_cast<int>(curr) != 92)new_+=curr;
-		else new_+="/";
+		else new_+=L"/";
 	}
 	return new_;
+}
+wsvector App::get_data_from_music(int type)
+{
+	wsvector data;
+	for(auto& m:music)
+	{
+		if(type == Album)data.push_back(m->album);
+		if(type == Artist)data.push_back(m->artist);
+		if(type == Title)data.push_back(m->title);
+	}
+	return data;
+}
+svector App::get_genre_data_from_music()
+{
+	svector data;
+	for(auto& m:music)
+	{
+		bool already_added = find(data.begin(),data.end(),m->genre) != data.end();
+		if(!already_added) data.push_back(m->genre);
+	}
+	data.erase(--data.end());
+	return data;
 }

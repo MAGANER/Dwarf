@@ -8,6 +8,10 @@
 #include<fstream>
 #include<clocale>
 #include<algorithm>
+#include<cwchar>
+#include "fileref.h"
+#include "tag.h"
+#include "MusicData.h"
 
 namespace fs = std::filesystem;
 using namespace Bubblegum;
@@ -15,6 +19,7 @@ using namespace _VirtualMachine;
 
 namespace Dwarf
 {
+typedef vector<wstring> wsvector;
 class App: public Console
 {
 private:
@@ -25,10 +30,10 @@ private:
 	int max_path_char_number;
 	
 	svector searching_paths;
-	svector raw_music;
+	vector<MusicData*> music;
 	svector groups;
 	
-	svector able_extensions;
+	wsvector able_extensions;
 	
 	enum working_modes
 	{
@@ -46,6 +51,15 @@ private:
 		Groups = 1,
 		Albums,
 		Artists,
+		Genres,
+	};
+	enum music_data_type
+	{
+		Album,
+		Title,
+		Artist,
+		Genre
+		
 	};
 
 	const int visible_range = 28;
@@ -66,9 +80,8 @@ private:
 	//path staff
 	svector get_searching_paths();
 	void get_music_files();
-	bool is_extension_able(const string& extension);
-	bool is_file_readeful(TagData tags);
-	string fix_path_slash(const string& path);
+	bool is_extension_able(const wstring& extension);
+	wstring fix_path_slash(const wstring& path);
 	//.
 	
 	//error staff 
@@ -96,7 +109,12 @@ private:
 	void run_base_menu_list();
 	void run_list_menu();
 	void run_list_groups();
-	string clear_spaces_at_end(const string& str);
+	void run_list_genres();
+	//.
+	
+	//
+	wsvector get_data_from_music(int type);
+	svector get_genre_data_from_music();
 	//.
 	
 	//common staff
