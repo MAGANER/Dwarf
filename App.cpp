@@ -19,7 +19,7 @@ App::App()
 	max_path_char_number = get_max_path_char_number();
 	set_terminal_size();
 	system("cls");
-
+	
 	current_mode = working_modes::MainMenu;
 }
 App::~App()
@@ -287,6 +287,8 @@ void App::run_base_menu_list()
 			system("cls");
 			if(current == Groups) run_list_groups();
 			if(current == Genres) run_list_genres();
+			if(current == Artists)run_list_artists("");
+			if(current == Albums) run_list_albums("",L"");
 			break;
 		}
 		
@@ -343,7 +345,6 @@ void App::run_list_groups()
 void App::run_list_genres()
 {
 	svector genres = get_genre_data_from_music();
-	unique(genres.begin(),genres.end());
 	
 	int current_elem = 0;
 	int start_counter = 0;
@@ -382,9 +383,232 @@ void App::run_list_genres()
 			--max_counter;
 			--start_counter;
 		}
+		if(input == ENTER)
+		{
+			system("cls");
+			choose_what_to_run(genres[current_elem]);
+		}
 
 		elem_pos.Y = 1;
 		system("cls");
+	}
+}
+void App::run_list_artists(const string& genre)
+{
+	wsvector artists = get_artists_data_from_music(genre);
+	
+	int current_elem = 0;
+	int start_counter = 0;
+	int max_counter   = artists.size()< visible_range? artists.size():visible_range;
+	COORD elem_pos{2,1};
+	while(true)
+	{
+		if(artists.empty())
+		{
+			COORD pos{10,5};
+			draw_string("there is no any artist!",standart,pos);
+		}
+		else
+		{
+			for(int i = start_counter;i<max_counter;++i)
+			{
+				if(!can_wstring_be_converted_to_std(artists[i]))
+				{
+					wstring text = artists[i];
+					if(current_elem == i)
+						draw_string(text,green_label,elem_pos);
+					else draw_string(text,standart,elem_pos);
+				}
+				else
+				{
+					string text = convert_wstring_to_std(artists[i]);
+					if(current_elem == i)
+						draw_string(text,green_label,elem_pos);
+					else draw_string(text,standart,elem_pos);					
+				}
+				
+				++elem_pos.Y;
+			}
+		}
+		
+		int input = _getch();
+		if(input == ESCAPE) break;
+		if(input == MINUS && current_elem != 0) --current_elem;
+		if(input == PLUS  && current_elem < max_counter-1)++current_elem;
+		if(input == DOWN  && max_counter != artists.size())
+		{
+			++max_counter;
+			++start_counter;
+		}
+		if(input == UP    && start_counter != 0)
+		{
+			--max_counter;
+			--start_counter;
+		}
+
+		elem_pos.Y = 1;
+		system("cls");
+	}
+}
+void App::run_list_albums(const string& genre,const wstring& artist)
+{
+	wsvector albums = get_album_data_from_music(artist,genre);
+	
+	int current_elem = 0;
+	int start_counter = 0;
+	int max_counter   = albums.size()< visible_range? albums.size():visible_range;
+	COORD elem_pos{2,1};
+	while(true)
+	{
+		if(albums.empty())
+		{
+			COORD pos{10,5};
+			draw_string("there is no any artist!",standart,pos);
+		}
+		else
+		{
+			for(int i = start_counter;i<max_counter;++i)
+			{
+				if(!can_wstring_be_converted_to_std(albums[i]))
+				{
+					wstring text = albums[i];
+					if(current_elem == i)
+						draw_string(text,green_label,elem_pos);
+					else draw_string(text,standart,elem_pos);
+				}
+				else
+				{
+					string text = convert_wstring_to_std(albums[i]);
+					if(current_elem == i)
+						draw_string(text,green_label,elem_pos);
+					else draw_string(text,standart,elem_pos);					
+				}
+				
+				++elem_pos.Y;
+			}
+		}
+		
+		int input = _getch();
+		if(input == ESCAPE) break;
+		if(input == MINUS && current_elem != 0) --current_elem;
+		if(input == PLUS  && current_elem < max_counter-1)++current_elem;
+		if(input == DOWN  && max_counter != albums.size())
+		{
+			++max_counter;
+			++start_counter;
+		}
+		if(input == UP    && start_counter != 0)
+		{
+			--max_counter;
+			--start_counter;
+		}
+
+		elem_pos.Y = 1;
+		system("cls");
+	}	
+}
+void App::run_list_titles(const string& genre,const wstring& artist)
+{
+	wsvector titles = get_title_data_from_music(artist,genre);
+	
+	int current_elem = 0;
+	int start_counter = 0;
+	int max_counter   = titles.size()< visible_range? titles.size():visible_range;
+	COORD elem_pos{2,1};
+	while(true)
+	{
+		if(titles.empty())
+		{
+			COORD pos{10,5};
+			draw_string("there is no any song!",standart,pos);
+		}
+		else
+		{
+			for(int i = start_counter;i<max_counter;++i)
+			{
+				if(!can_wstring_be_converted_to_std(titles[i]))
+				{
+					wstring text = titles[i];
+					if(current_elem == i)
+						draw_string(text,green_label,elem_pos);
+					else draw_string(text,standart,elem_pos);
+				}
+				else
+				{
+					string text = convert_wstring_to_std(titles[i]);
+					if(current_elem == i)
+						draw_string(text,green_label,elem_pos);
+					else draw_string(text,standart,elem_pos);					
+				}
+				
+				++elem_pos.Y;
+			}
+		}
+		
+		int input = _getch();
+		if(input == ESCAPE) break;
+		if(input == MINUS && current_elem != 0) --current_elem;
+		if(input == PLUS  && current_elem < max_counter-1)++current_elem;
+		if(input == DOWN  && max_counter != titles.size())
+		{
+			++max_counter;
+			++start_counter;
+		}
+		if(input == UP    && start_counter != 0)
+		{
+			--max_counter;
+			--start_counter;
+		}
+
+		elem_pos.Y = 1;
+		system("cls");
+	}
+}
+void App::choose_what_to_run(const string& genre_name)
+{
+	COORD pos{20,5};
+	svector text = 
+	{
+		"What you want to see from "+genre_name+":",
+		"Arists",
+		"Albums",
+		"Compositions",
+	};
+	
+	int min = 1;
+	int max = 3;
+	int current = 1;
+	while(true)
+	{
+		for(size_t i = 0;i<text.size();++i)
+		{
+			if(i == 1)pos.X = 25;
+			if(current != i)draw_string(text[i],standart,pos);
+			else draw_string(text[i],green_label,pos);
+			++pos.Y;
+		}
+		
+		int input = _getch();
+		if(input == UP &&  current != min)
+		{
+			--current;
+		}
+		if(input == DOWN && current != max)
+		{ 
+			++current;
+		}
+		if(input == ESCAPE) break;
+		if(input == ENTER)
+		{
+			system("cls");
+			if(current == 1) run_list_artists(genre_name);
+			if(current == 2) run_list_albums(genre_name,L"");
+			if(current == 3) run_list_titles(genre_name,L"");
+			break;
+		}
+		
+		pos.Y = 5;
+		pos.X = 20;
 	}
 }
 wstring App::fix_path_slash(const wstring& path)
@@ -399,17 +623,6 @@ wstring App::fix_path_slash(const wstring& path)
 	}
 	return new_;
 }
-wsvector App::get_data_from_music(int type)
-{
-	wsvector data;
-	for(auto& m:music)
-	{
-		if(type == Album)data.push_back(m->album);
-		if(type == Artist)data.push_back(m->artist);
-		if(type == Title)data.push_back(m->title);
-	}
-	return data;
-}
 svector App::get_genre_data_from_music()
 {
 	svector data;
@@ -420,4 +633,66 @@ svector App::get_genre_data_from_music()
 	}
 	data.erase(--data.end());
 	return data;
+}
+wsvector App::get_artists_data_from_music(const string& genre)
+{
+	wsvector data;
+	for(auto& m:music)
+	{
+		bool already_added = find(data.begin(),data.end(),m->artist) != data.end();
+		if(!already_added && genre.empty()) data.push_back(m->artist);
+		else if(!already_added && genre == m->genre) data.push_back(m->artist);
+	}
+	return data;
+}
+wsvector App::get_album_data_from_music(const wstring& artist, const string& genre)
+{
+	wsvector data;
+	for(auto& m:music)
+	{
+		bool already_added = find(data.begin(),data.end(),m->album) != data.end();
+		if(!already_added)
+		{
+			if(artist.empty()      && genre.empty())     data.push_back(m->album);
+			else if(artist.empty() && genre == m->genre) data.push_back(m->album);
+			else if(genre.empty()  && artist== m->artist)data.push_back(m->album);
+			else if(genre == m->genre && artist == m->artist) data.push_back(m->album);
+		}
+	}
+	return data;
+}
+wsvector App::get_title_data_from_music(const wstring& artist, const string& genre)
+{
+	wsvector data;
+	for(auto& m:music)
+	{
+		bool already_added = find(data.begin(),data.end(),m->title) != data.end();
+		if(!already_added)
+		{
+			
+			if(artist.empty()      && genre.empty())     data.push_back(m->title);
+			else if(genre == m->genre) data.push_back(m->title);
+			else if(genre.empty()  && artist== m->artist)data.push_back(m->title);
+			else if(genre == m->genre && artist == m->artist) data.push_back(m->title);
+		}
+	}
+	return data;
+}
+bool App::can_wstring_be_converted_to_std(const wstring& str)
+{
+	for(auto& ch:str)
+	{
+		if(wctob(ch) == EOF) return false;
+	}
+	return true;
+}
+string App::convert_wstring_to_std(const wstring& str)
+{
+	string new_str;
+	for(auto& ch:str)
+	{
+		char new_ch = wctob(ch);
+		new_str+=new_ch;
+	}
+	return new_str;
 }

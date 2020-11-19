@@ -105,21 +105,34 @@ private:
 	void run_search_menu();
 	//.
 	
-	//listing menu staff
+	//listing menu staff	
 	void run_base_menu_list();
 	void run_list_menu();
 	void run_list_groups();
+	
 	void run_list_genres();
+	void choose_what_to_run(const string& genre_name);
+	
+	void run_list_artists(const string& genre);
+	void run_list_albums(const string& genre,const wstring& artist);
+	void run_list_titles(const string& genre,const wstring& artist);
 	//.
 	
 	//
-	wsvector get_data_from_music(int type);
 	svector get_genre_data_from_music();
+	wsvector get_artists_data_from_music(const string& genre);
+	wsvector get_album_data_from_music(const wstring& artist, const string& genre);
+	wsvector get_title_data_from_music(const wstring& artist, const string& genre);
 	//.
 	
 	//common staff
 	void run_mode();
 	void set_mode(int input_code);
+	//.
+	
+	//converting
+	bool can_wstring_be_converted_to_std(const wstring& str);
+	string convert_wstring_to_std(const wstring& str);
 	//.
 	
 };
