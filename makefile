@@ -1,15 +1,17 @@
 CPP      = g++.exe
-INCS     = -I"E:/cpp_projects/DwarfAudioPlayer" -I"E:/id3v2lib-master/include"
+TAGLIB_INCS = -I"E:/taglib-1.10/taglib/" -I"E:/taglib-1.10/taglib/toolkit/" -I"E:/taglib-1.10/build/"
+INCS     = -I"E:/cpp_projects/DwarfAudioPlayer" $(TAGLIB_INCS)
 FLAG     = $(INCS) -std=c++17 -g3
 
+taglib_path       = E:/taglib-1.10/build/taglib/libtag.dll.a
 objects 		  = main.o app.o console.o
 bublegum_objects  = ErrorPrinter.o TypeChecker.o Memory.o VirtualMachine.o
 
 dwarf : $(objects) $(bublegum_objects)
-	$(CPP) -o build/dwarf $(objects) $(bublegum_objects)
+	$(CPP) -o build/dwarf $(objects) $(bublegum_objects) $(taglib_path)
 
 app.o : app.cpp 
-	$(CPP) -c app.cpp app.h console.h VirtualMachine/VirtualMachine.h $(FLAG)
+	$(CPP) -c app.cpp app.h console.h MusicData.h VirtualMachine/VirtualMachine.h $(FLAG)
 
 console.o : console.cpp
 	$(CPP) -c console.cpp console.h $(FLAG)
