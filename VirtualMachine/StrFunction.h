@@ -37,6 +37,18 @@ string get_substr(const string& str,int begin, int end)
 	}
 	return sub;
 }
+wstring get_substr(const wstring& str,int begin, int end)
+{
+	/*i hate standart substr method, cos it takes
+	  start and the len of substring. it's awful
+	*/
+	wstring sub;
+	for(size_t i = begin;i<end;++i)
+	{
+		sub.push_back(str[i]);
+	}
+	return sub;
+}
 f_pos find_substr(const string& str, const string& sub)
 {
 	//actualy, it can be deleted
