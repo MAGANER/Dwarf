@@ -212,7 +212,7 @@ void App::get_music_files()
 		for(auto& data: fs::recursive_directory_iterator(spath))
 		{
 			wstring str = fix_path_slash(data.path().wstring());
-			int point = str.find(L".");
+			int point = str.find_last_of(L".");
 			if(point != wstring::npos)
 			{
 				wstring extension = get_substr(str,point+1,str.size());
@@ -494,7 +494,7 @@ void App::run_list_titles(const wstring& genre,const wstring& artist, const wstr
 {
 	wsvector titles;
 	if(album.empty()) titles = get_title_data_from_music(artist,genre);
-	else titles = get_title_data_from_music(artist,genre,album);
+	else titles = get_title_data_from_music(album);
 	
 	int choosen_option = -1;
 	int current_elem = 0;
@@ -685,7 +685,7 @@ wsvector App::get_title_data_from_music(const wstring& artist, const wstring& ge
 	}
 	return data;
 }
-wsvector App::get_title_data_from_music(const wstring& artist, const wstring& genre, const wstring& album)
+wsvector App::get_title_data_from_music(const wstring& album)
 {
 	wsvector data;
 	for(auto& m:music)
@@ -693,9 +693,7 @@ wsvector App::get_title_data_from_music(const wstring& artist, const wstring& ge
 		bool is_new = find(data.begin(),data.end(),m->title) == data.end();
 		if(is_new)
 		{
-			if(genre  == m->genre   && 
-			   artist == m->artist &&
-			   album  == m->album) data.push_back(m->title);
+			if(album  == m->album) data.push_back(m->title);
 		}
 	}
 	return data;	

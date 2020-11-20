@@ -138,7 +138,7 @@ private:
 	wsvector get_artists_data_from_music(const wstring& genre);
 	wsvector get_album_data_from_music(const wstring& artist, const wstring& genre);
 	wsvector get_title_data_from_music(const wstring& artist, const wstring& genre);
-	wsvector get_title_data_from_music(const wstring& artist, const wstring& genre, const wstring& album);
+	wsvector get_title_data_from_music(const wstring& album);
 	//.
 	
 	//common staff
