@@ -149,7 +149,7 @@ int App::get_max_path_char_number()
 void App::set_terminal_size()
 {
 	HANDLE terminal = GetStdHandle(STD_OUTPUT_HANDLE);
-	COORD bufferSize = {75,75};
+	COORD bufferSize = {75,450};
 	SetConsoleScreenBufferSize(terminal,bufferSize);
 	HWND hwnd = FindWindow(NULL,"Dwarf");
 	MoveWindow(hwnd,100,100,size.x,size.y,false);
@@ -321,6 +321,7 @@ void App::run_common_list(const wsvector& data,
 		for(int i = start_counter;i<max_counter;++i)
 		{
 			auto curr = data[i];
+			if(curr.size() > 73) curr = get_substr(curr,0,73)+L"...";
 			if(!can_wstring_be_converted_to_std(curr))
 			{
 				if(current_elem == i)
@@ -361,9 +362,9 @@ void App::run_common_list(const wsvector& data,
 	//write this istead of system clearing
 	//because it blinks
 	COORD clear_pos{0,0};
-	for(int i = start_counter;i<max_counter+1;++i)
+	for(int i = start_counter;i<max_counter+2;++i)
 	{
-		draw_string(string(75,' '),empty,clear_pos);
+		draw_string(string(100,' '),empty,clear_pos);
 		clear_pos.Y++;
 	}
 	clear_pos.Y = 0;
