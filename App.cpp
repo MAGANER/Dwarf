@@ -521,14 +521,18 @@ void App::run_common_choosing_list(const wsvector& text,
 								   int& current,
 								   int& choosen_option)
 {
-	COORD pos{20,5};
+	COORD pos{10,4};
 	while(true)
 	{
 		for(size_t i = 0;i<text.size();++i)
 		{
 			auto curr = text[i];
 			
-			if(i == 1)pos.X = 25;
+			if(i == 1)
+			{
+				pos.X = 25;
+				pos.Y = 10;
+			}
 			if(!can_wstring_be_converted_to_std(curr))
 			{
 				if(current == i)
@@ -567,8 +571,8 @@ void App::run_common_choosing_list(const wsvector& text,
 			break;
 		}
 		
-		pos.Y = 5;
-		pos.X = 20;
+		pos.Y = 4;
+		pos.X = 10;
 	}	
 }
 								  
@@ -613,8 +617,8 @@ void App::choose_what_to_run_from_artist_menu(const wstring& artist,const wstrin
 	while(true)
 	{
 		run_common_choosing_list(text,min,max,current,choosen_option);
-		if(choosen_option == 1) run_list_albums(genre,artist);
-		if(choosen_option == 2) run_list_titles(genre,artist,L"");
+		if(choosen_option == 1) run_list_albums(L"",artist);
+		if(choosen_option == 2) run_list_titles(L"",artist,L"");
 		if(choosen_option == -2) break;
 	}
 	system("cls");	
