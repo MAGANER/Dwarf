@@ -432,7 +432,10 @@ void App::run_list_genres()
 						"Genres:");
 		if(choosen_option == -2) break;
 		if(choosen_option > 0)
+		{
 			choose_what_to_run_from_genre_menu(genres[choosen_option]);
+			choosen_option = -1;
+		}
 	}
 }
 void App::run_list_artists(const wstring& genre)
@@ -454,6 +457,11 @@ void App::run_list_artists(const wstring& genre)
 						max_counter,
 						"Artists:");
 		if(choosen_option == -2) break;
+		if(choosen_option == current_elem)
+		{			
+			choose_what_to_run_from_artist_menu(artists[current_elem],genre);
+			choosen_option = -1;
+		}
 	}
 }
 void App::run_list_albums(const wstring& genre,const wstring& artist)
@@ -475,11 +483,18 @@ void App::run_list_albums(const wstring& genre,const wstring& artist)
 						max_counter,
 						"Albums:");
 		if(choosen_option == -2) break;
+		if(choosen_option == current_elem)
+		{	
+			run_list_titles(genre,artist,albums[current_elem]);
+			choosen_option = -1;
+		}
 	}
 }
-void App::run_list_titles(const wstring& genre,const wstring& artist)
+void App::run_list_titles(const wstring& genre,const wstring& artist, const wstring& album)
 {
-	wsvector titles = get_title_data_from_music(artist,genre);
+	wsvector titles;
+	if(album.empty()) titles = get_title_data_from_music(artist,genre);
+	else titles = get_title_data_from_music(artist,genre,album);
 	
 	int choosen_option = -1;
 	int current_elem = 0;
@@ -497,6 +512,7 @@ void App::run_list_titles(const wstring& genre,const wstring& artist)
 						"Compositions:");
 		if(choosen_option == -2) break;
 	}
+	system("cls");
 }
 void App::run_common_choosing_list(const wsvector& text,
 								   int& min,
@@ -575,10 +591,32 @@ void App::choose_what_to_run_from_genre_menu(const wstring& genre_name)
 		run_common_choosing_list(text,min,max,current,choosen_option);
 		if(choosen_option == 1) run_list_artists(genre_name);
 		if(choosen_option == 2) run_list_albums(genre_name,L"");
-		if(choosen_option == 3) run_list_titles(genre_name,L"");
+		if(choosen_option == 3) run_list_titles(genre_name,L"",L"");
 		if(choosen_option == -2) break;
 	}
 	system("cls");
+}
+void App::choose_what_to_run_from_artist_menu(const wstring& artist,const wstring& genre)
+{
+	wsvector text = 
+	{
+		L"What you want to see from "+artist+L":",
+		L"Albums",
+		L"All compositions",
+	};
+	int choosen_option = -1;
+	
+	int min = 1;
+	int max = 2;
+	int current = 1;
+	while(true)
+	{
+		run_common_choosing_list(text,min,max,current,choosen_option);
+		if(choosen_option == 1) run_list_albums(genre,artist);
+		if(choosen_option == 2) run_list_titles(genre,artist,L"");
+		if(choosen_option == -2) break;
+	}
+	system("cls");	
 }
 wstring App::fix_path_slash(const wstring& path)
 {
@@ -646,6 +684,21 @@ wsvector App::get_title_data_from_music(const wstring& artist, const wstring& ge
 		}
 	}
 	return data;
+}
+wsvector App::get_title_data_from_music(const wstring& artist, const wstring& genre, const wstring& album)
+{
+	wsvector data;
+	for(auto& m:music)
+	{
+		bool is_new = find(data.begin(),data.end(),m->title) == data.end();
+		if(is_new)
+		{
+			if(genre  == m->genre   && 
+			   artist == m->artist &&
+			   album  == m->album) data.push_back(m->title);
+		}
+	}
+	return data;	
 }
 bool App::can_wstring_be_converted_to_std(const wstring& str)
 {

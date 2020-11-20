@@ -126,10 +126,11 @@ private:
 	
 	void run_list_genres();
 	void choose_what_to_run_from_genre_menu(const wstring& genre_name);
+	void choose_what_to_run_from_artist_menu(const wstring& artist, const wstring& genre);
 	
 	void run_list_artists(const wstring& genre);
 	void run_list_albums(const wstring& genre,const wstring& artist);
-	void run_list_titles(const wstring& genre,const wstring& artist);
+	void run_list_titles(const wstring& genre,const wstring& artist, const wstring& album);
 	//.
 	
 	//
@@ -137,6 +138,7 @@ private:
 	wsvector get_artists_data_from_music(const wstring& genre);
 	wsvector get_album_data_from_music(const wstring& artist, const wstring& genre);
 	wsvector get_title_data_from_music(const wstring& artist, const wstring& genre);
+	wsvector get_title_data_from_music(const wstring& artist, const wstring& genre, const wstring& album);
 	//.
 	
 	//common staff
