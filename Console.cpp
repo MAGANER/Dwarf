@@ -57,8 +57,7 @@ void Console::draw_string(const string& str, const Color& color, const COORD& po
 	SetConsoleTextAttribute(console, (WORD)((color.background << 4) | color.foreground ));
 	SetConsoleCursorPosition(console,pos);
 	
-	PDWORD written = 0;
-	WriteConsoleA(console,str.c_str(),strlen(str.c_str()),written,NULL);
+	cout<<str;
 }
 void Console::draw_string(const wstring& str, const Color& color, const COORD& pos)
 {
@@ -66,8 +65,7 @@ void Console::draw_string(const wstring& str, const Color& color, const COORD& p
 	SetConsoleTextAttribute(console, (WORD)((color.background << 4) | color.foreground ));
 	SetConsoleCursorPosition(console,pos);
 	
-	PDWORD written = 0;
-	WriteConsoleA(console,str.c_str(), wcslen(str.c_str()),written,NULL);
+	wcout<<str;
 }
 
 

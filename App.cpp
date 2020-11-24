@@ -3,6 +3,7 @@ using namespace Dwarf;
 
 App::App()
 {	
+	SetConsoleOutputCP(1251);
 	system("title Dwarf");
 	system("cls");
 	
@@ -57,7 +58,7 @@ void App::draw_help()
 		"2 -> to go the default music list",
 		"3 -> to search a track album group",
 		"4 -> to add new path, where music is",
-		"Exit -> to quit the application"
+		"Exit -> to quit the applicationL"
 	};
 	
 	for(size_t i = 0;i<text.size();++i)
@@ -309,7 +310,6 @@ void App::run_common_list(const wsvector& data,
 {
 	COORD title_pos{0,0};
 	draw_string(title,red_label,title_pos);
-	
 	COORD elem_pos{2,1};
 	if(data.empty())
 	{
