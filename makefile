@@ -1,23 +1,20 @@
 CPP      = g++.exe
+IRK_KLANG_INCS = -I"E:/irrKlang/include/"
 TAGLIB_INCS = -I"E:/taglib-1.10/taglib/" -I"E:/taglib-1.10/taglib/toolkit/" -I"E:/taglib-1.10/build/"
-SDL_INCS = -I"E:/SDL2/include"
-INCS     = -I"E:/cpp_projects/DwarfAudioPlayer" $(TAGLIB_INCS) $(SDL_INCS)
+INCS     = -I"E:/cpp_projects/DwarfAudioPlayer" $(TAGLIB_INCS) $(IRK_KLANG_INCS)
 FLAG     = $(INCS) -std=c++17 -g3 
 
-
-sdl_path          = E:/SDL2/build/libSDL2.dll.a
+irk_klang_lib     = E:/irrKlang/lib/Win32-gcc/libirrKlang.a
 taglib_path       = E:/taglib-1.10/build/taglib/libtag.dll.a
-objects 		  = main.o app.o console.o audio.o
+objects 		  = main.o app.o console.o
 bublegum_objects  = ErrorPrinter.o TypeChecker.o Memory.o VirtualMachine.o
 
 dwarf : $(objects) $(bublegum_objects)
-	$(CPP) $(LINKER_FLAGS) -o build/dwarf $(objects) $(bublegum_objects) $(taglib_path) $(sdl_path)
+	$(CPP) -o build/dwarf $(objects) $(bublegum_objects) $(taglib_path) $(irk_klang_lib)
 
-audio.o : audio.c
-	$(CPP) -c audio.c audio.h $(FLAG)
 
 app.o : app.cpp 
-	$(CPP) -c app.cpp app.h console.h MusicData.h audio.h VirtualMachine/VirtualMachine.h $(FLAG)
+	$(CPP) -c app.cpp app.h console.h MusicData.h VirtualMachine/VirtualMachine.h $(FLAG)
 
 console.o : console.cpp
 	$(CPP) -c console.cpp console.h $(FLAG)

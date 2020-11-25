@@ -9,18 +9,23 @@
 #include<clocale>
 #include<algorithm>
 #include<cwchar>
+#include<utility>
 #include "fileref.h"
 #include "tag.h"
 #include "MusicData.h"
-#include "audio.h"
+#include "irrKlang.h"
 
 namespace fs = std::filesystem;
 using namespace Bubblegum;
 using namespace _VirtualMachine;
+using namespace irrklang;
 
 namespace Dwarf
 {
 typedef vector<wstring> wsvector;
+typedef pair<wstring,wstring> wspair;
+typedef vector<wspair> wspvector;
+
 class App: public Console
 {
 private:
@@ -35,6 +40,8 @@ private:
 	svector groups;
 	
 	wsvector able_extensions;
+	
+	ISoundEngine* engine;
 	
 	enum working_modes
 	{
@@ -134,18 +141,21 @@ private:
 	void run_list_titles(const wstring& genre,const wstring& artist, const wstring& album);
 	void run_playing_composition(const wstring& artist, 
 								 const wstring& album,
-								 const wstring& title);
+								 const wspair& title);
 	//.
 	
 	//
+	wstring get_path_to_title(const wstring& artist, 
+							   const wstring& album,
+							   const wstring& title);
 	wstring get_genre_of_title(const wstring& artist, 
 							   const wstring& album,
 							   const wstring& title);
 	wsvector get_genre_data_from_music();
 	wsvector get_artists_data_from_music(const wstring& genre);
 	wsvector get_album_data_from_music(const wstring& artist, const wstring& genre);
-	wsvector get_title_data_from_music(const wstring& artist, const wstring& genre);
-	wsvector get_title_data_from_music(const wstring& album);
+	wspvector get_title_data_from_music(const wstring& artist, const wstring& genre);
+	wspvector get_title_data_from_music(const wstring& album);
 	//.
 	
 	//common staff

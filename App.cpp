@@ -24,13 +24,11 @@ App::App()
 	
 	current_mode = working_modes::MainMenu;
 	
-	SDL_Init(SDL_INIT_AUDIO);
-	initAudio();
+	engine = createIrrKlangDevice();
 }
 App::~App()
 {
-	endAudio();
-	SDL_Quit();
+	delete engine;
 }
 
 void App::run()
@@ -230,7 +228,7 @@ void App::get_music_files()
 					wstring album  = tag->album().toWString();
 					wstring genre  = tag->genre().toWString();
 					unsigned int year= tag->year();
-					MusicData* data = new MusicData(artist,title,album,genre,year);
+					MusicData* data = new MusicData(artist,title,album,genre,str,year);
 					music.push_back(data);
 				}
 			}
@@ -497,9 +495,13 @@ void App::run_list_albums(const wstring& genre,const wstring& artist)
 }
 void App::run_list_titles(const wstring& genre,const wstring& artist, const wstring& album)
 {
-	wsvector titles;
+	wspvector titles;
+	wsvector titles_only;
+
 	if(album.empty()) titles = get_title_data_from_music(artist,genre);
 	else titles = get_title_data_from_music(album);
+	
+	for(auto t:titles) titles_only.push_back(t.first);
 	
 	int choosen_option = -1;
 	int current_elem = 0;
@@ -508,7 +510,7 @@ void App::run_list_titles(const wstring& genre,const wstring& artist, const wstr
 	
 	while(true)
 	{
-		run_common_list(titles,
+		run_common_list(titles_only,
 						choosen_option,
 						"there is no any composition!",
 						current_elem,
@@ -587,30 +589,59 @@ void App::run_common_choosing_list(const wsvector& text,
 }
 void App::run_playing_composition(const wstring& artist,
 								  const wstring& album,
-								  const wstring& title)
-{
-	wstring genre = get_genre_of_title(artist,album,title);
+								  const wspair& title)
+{	
+	wstring genre = get_genre_of_title(artist,album,title.first);
+	wstring _path = title.second;
+	string  path  = convert_wstring_to_std(_path); 
 	
 	wstring label = L"Playing:";
 	COORD label_pos = {2,0};
 	
-	COORD title_pos  ={4,1};
-	COORD artist_pos ={4,2};
-	COORD album_pos  ={4,3};
-	COORD genre_pos  ={4,4};
-	
+	COORD title_pos  ={4,2};
+	COORD artist_pos ={4,3};
+	COORD album_pos  ={4,4};
+	COORD genre_pos  ={4,5};
+	COORD volume_pos ={4,7};
+
+	bool play = false;
 	while(true)
 	{
+		int volume = engine->getSoundVolume()*100.0f;
+		string volume_str = to_string(volume);
+		
 		draw_string(label,red_label,label_pos);
 		
-		draw_string(L"Title:"+title,standart,title_pos);
+		draw_string(L"Title:"+title.first,standart,title_pos);
 		draw_string(L"Artist:"+artist,standart,artist_pos);
 		draw_string(L"Album:"+album,standart,album_pos);
 		draw_string(L"Genre:"+genre,standart,genre_pos);
+		draw_string("volume:"+volume_str+"% ",standart,volume_pos);
+		
+		if(!play)
+		{
+			engine->play2D(path.c_str(),false);
+			play = true;
+		}
 		
 		int input = _getch();
-		if(input == ESCAPE) break;
+		if(input == ESCAPE) 
+		{
+			engine->stopAllSounds();
+			break;
+		}
+		
+		float val = engine->getSoundVolume();
+		if(input == PLUS)
+		{
+			if(val < 1.0f) engine->setSoundVolume(val+0.01f);
+		}
+		if(input == MINUS)
+		{
+			if(val > 0.0f) engine->setSoundVolume(val-0.01f);
+		}
 	}
+	
 	system("cls");
 }									  
 void App::choose_what_to_run_from_genre_menu(const wstring& genre_name)
@@ -671,6 +702,19 @@ wstring App::fix_path_slash(const wstring& path)
 	}
 	return new_;
 }
+wstring App::get_path_to_title(const wstring& artist, 
+							   const wstring& album,
+							   const wstring& title)
+{
+	wstring path;
+	for(auto& m:music)
+	{
+		if(m->artist == artist &&
+		   m->album  == album  &&
+		   m->title  == title) path = m->path;
+	}
+	return path;
+}
 wstring App::get_genre_of_title(const wstring& artist, 
 							    const wstring& album,
 							    const wstring& title)
@@ -723,32 +767,34 @@ wsvector App::get_album_data_from_music(const wstring& artist, const wstring& ge
 	}
 	return data;
 }
-wsvector App::get_title_data_from_music(const wstring& artist, const wstring& genre)
+wspvector App::get_title_data_from_music(const wstring& artist, const wstring& genre)
 {
-	wsvector data;
+	wspvector data;
 	for(auto& m:music)
 	{
-		bool is_new = find(data.begin(),data.end(),m->title) == data.end();
+		wspair _new(m->title,m->path);
+		bool is_new = find(data.begin(),data.end(),_new) == data.end();
 		if(is_new)
 		{
 			
-			if(artist.empty()      && genre.empty())       data.push_back(m->title);
-			if(genre == m->genre   && artist.empty())      data.push_back(m->title);
-			if(genre.empty()       && artist== m->artist)  data.push_back(m->title);
-			if(genre == m->genre   && artist == m->artist) data.push_back(m->title);
+			if(artist.empty()      && genre.empty())       data.push_back(wspair(m->title,m->path));
+			if(genre == m->genre   && artist.empty())      data.push_back(wspair(m->title,m->path));
+			if(genre.empty()       && artist== m->artist)  data.push_back(wspair(m->title,m->path));
+			if(genre == m->genre   && artist == m->artist) data.push_back(wspair(m->title,m->path));
 		}
 	}
 	return data;
 }
-wsvector App::get_title_data_from_music(const wstring& album)
+wspvector App::get_title_data_from_music(const wstring& album)
 {
-	wsvector data;
+	wspvector data;
 	for(auto& m:music)
 	{
-		bool is_new = find(data.begin(),data.end(),m->title) == data.end();
+		wspair _new(m->title,m->path);
+		bool is_new = find(data.begin(),data.end(),_new) == data.end();
 		if(is_new)
 		{
-			if(album  == m->album) data.push_back(m->title);
+			if(album  == m->album) data.push_back(wspair(m->title,m->path));
 		}
 	}
 	return data;	
