@@ -1,17 +1,23 @@
 CPP      = g++.exe
 TAGLIB_INCS = -I"E:/taglib-1.10/taglib/" -I"E:/taglib-1.10/taglib/toolkit/" -I"E:/taglib-1.10/build/"
-INCS     = -I"E:/cpp_projects/DwarfAudioPlayer" $(TAGLIB_INCS)
-FLAG     = $(INCS) -std=c++17 -g3
+SDL_INCS = -I"E:/SDL2/include"
+INCS     = -I"E:/cpp_projects/DwarfAudioPlayer" $(TAGLIB_INCS) $(SDL_INCS)
+FLAG     = $(INCS) -std=c++17 -g3 
 
+
+sdl_path          = E:/SDL2/build/libSDL2.dll.a
 taglib_path       = E:/taglib-1.10/build/taglib/libtag.dll.a
-objects 		  = main.o app.o console.o
+objects 		  = main.o app.o console.o audio.o
 bublegum_objects  = ErrorPrinter.o TypeChecker.o Memory.o VirtualMachine.o
 
 dwarf : $(objects) $(bublegum_objects)
-	$(CPP) -o build/dwarf $(objects) $(bublegum_objects) $(taglib_path)
+	$(CPP) $(LINKER_FLAGS) -o build/dwarf $(objects) $(bublegum_objects) $(taglib_path) $(sdl_path)
+
+audio.o : audio.c
+	$(CPP) -c audio.c audio.h $(FLAG)
 
 app.o : app.cpp 
-	$(CPP) -c app.cpp app.h console.h MusicData.h VirtualMachine/VirtualMachine.h $(FLAG)
+	$(CPP) -c app.cpp app.h console.h MusicData.h audio.h VirtualMachine/VirtualMachine.h $(FLAG)
 
 console.o : console.cpp
 	$(CPP) -c console.cpp console.h $(FLAG)
