@@ -23,10 +23,14 @@ App::App()
 	system("cls");
 	
 	current_mode = working_modes::MainMenu;
+	
+	SDL_Init(SDL_INIT_AUDIO);
+	initAudio();
 }
 App::~App()
 {
-	
+	endAudio();
+	SDL_Quit();
 }
 
 void App::run()
@@ -58,7 +62,7 @@ void App::draw_help()
 		"2 -> to go the default music list",
 		"3 -> to search a track album group",
 		"4 -> to add new path, where music is",
-		"Exit -> to quit the applicationL"
+		"Exit -> to quit the application"
 	};
 	
 	for(size_t i = 0;i<text.size();++i)
@@ -512,6 +516,12 @@ void App::run_list_titles(const wstring& genre,const wstring& artist, const wstr
 						max_counter,
 						"Compositions:");
 		if(choosen_option == -2) break;
+		if(choosen_option == current_elem)
+		{
+			system("cls");
+			run_playing_composition(artist,album,titles[current_elem]);
+			choosen_option = -1;
+		}
 	}
 	system("cls");
 }
@@ -575,8 +585,34 @@ void App::run_common_choosing_list(const wsvector& text,
 		pos.X = 10;
 	}	
 }
-								  
-								  
+void App::run_playing_composition(const wstring& artist,
+								  const wstring& album,
+								  const wstring& title)
+{
+	wstring genre = get_genre_of_title(artist,album,title);
+	
+	wstring label = L"Playing:";
+	COORD label_pos = {2,0};
+	
+	COORD title_pos  ={4,1};
+	COORD artist_pos ={4,2};
+	COORD album_pos  ={4,3};
+	COORD genre_pos  ={4,4};
+	
+	while(true)
+	{
+		draw_string(label,red_label,label_pos);
+		
+		draw_string(L"Title:"+title,standart,title_pos);
+		draw_string(L"Artist:"+artist,standart,artist_pos);
+		draw_string(L"Album:"+album,standart,album_pos);
+		draw_string(L"Genre:"+genre,standart,genre_pos);
+		
+		int input = _getch();
+		if(input == ESCAPE) break;
+	}
+	system("cls");
+}									  
 void App::choose_what_to_run_from_genre_menu(const wstring& genre_name)
 {
 	wsvector text = 
@@ -635,6 +671,20 @@ wstring App::fix_path_slash(const wstring& path)
 	}
 	return new_;
 }
+wstring App::get_genre_of_title(const wstring& artist, 
+							    const wstring& album,
+							    const wstring& title)
+{
+	wstring str;
+	for(auto& m:music)
+	{
+		if(m->artist == artist &&
+		   m->album  == album  &&
+		   m->title  == title) str = m->genre;
+	}
+	if(str.empty()) str = L"None";
+	return str;
+}								   
 wsvector App::get_genre_data_from_music()
 {
 	wsvector data;

@@ -12,6 +12,7 @@
 #include "fileref.h"
 #include "tag.h"
 #include "MusicData.h"
+#include "audio.h"
 
 namespace fs = std::filesystem;
 using namespace Bubblegum;
@@ -131,9 +132,15 @@ private:
 	void run_list_artists(const wstring& genre);
 	void run_list_albums(const wstring& genre,const wstring& artist);
 	void run_list_titles(const wstring& genre,const wstring& artist, const wstring& album);
+	void run_playing_composition(const wstring& artist, 
+								 const wstring& album,
+								 const wstring& title);
 	//.
 	
 	//
+	wstring get_genre_of_title(const wstring& artist, 
+							   const wstring& album,
+							   const wstring& title);
 	wsvector get_genre_data_from_music();
 	wsvector get_artists_data_from_music(const wstring& genre);
 	wsvector get_album_data_from_music(const wstring& artist, const wstring& genre);
