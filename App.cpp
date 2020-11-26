@@ -604,6 +604,10 @@ void App::run_playing_composition(const wstring& artist,
 	COORD genre_pos  ={4,5};
 	COORD volume_pos ={4,7};
 	COORD length_pos ={4,8};
+	COORD curr_pos_pos={4,9};
+	
+	COORD help1 = {5,15};
+	COORD help2 = {5,16};
 	
 	ISoundSource* music = nullptr;
 	unsigned int hours, mins, secs;
@@ -623,7 +627,8 @@ void App::run_playing_composition(const wstring& artist,
 		draw_string(L"Album:"+album,standart,album_pos);
 		draw_string(L"Genre:"+genre,standart,genre_pos);
 		draw_string("volume:"+volume_str+"% ",standart,volume_pos);
-		
+		draw_string("+/- to change volume",green_label,help1);
+		draw_string("SPACE to pause/unpause",green_label,help2);
 				
 		if(!play)
 		{
@@ -650,6 +655,7 @@ void App::run_playing_composition(const wstring& artist,
 		}
 		string text = "length = "+to_string(hours)+":"+to_string(mins)+":"+to_string(secs);
 		draw_string(text, standart,length_pos);
+		
 		
 		
 		int input = _getch();
