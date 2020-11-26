@@ -43,6 +43,7 @@ private:
 	wsvector able_extensions;
 	
 	ISoundEngine* engine;
+	svector loaded_music;
 	
 	enum working_modes
 	{

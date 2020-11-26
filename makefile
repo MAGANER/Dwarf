@@ -14,7 +14,7 @@ dwarf : $(objects) $(bublegum_objects)
 
 
 app.o : app.cpp 
-	$(CPP) -c app.cpp app.h console.h MusicData.h VirtualMachine/VirtualMachine.h $(FLAG)
+	$(CPP) -c app.cpp app.h console.h MusicData.h PlayTime.h VirtualMachine/VirtualMachine.h $(FLAG)
 
 console.o : console.cpp
 	$(CPP) -c console.cpp console.h $(FLAG)

@@ -605,8 +605,8 @@ void App::run_playing_composition(const wstring& artist,
 	COORD volume_pos ={4,7};
 	COORD length_pos ={4,8};
 	
-	
-	ISound* music = nullptr;
+	ISoundSource* music = nullptr;
+	unsigned int hours, mins, secs;
 	
 	bool play = false;
 	bool pause= false;
@@ -623,13 +623,35 @@ void App::run_playing_composition(const wstring& artist,
 		draw_string(L"Album:"+album,standart,album_pos);
 		draw_string(L"Genre:"+genre,standart,genre_pos);
 		draw_string("volume:"+volume_str+"% ",standart,volume_pos);
-	
 		
+				
 		if(!play)
 		{
-			music = engine->play2D(path.c_str(),false);
+			bool is_loaded_already = find(loaded_music.begin(),loaded_music.end(),path) != loaded_music.end();
+			if(!is_loaded_already)
+			{
+				music = engine->addSoundSourceFromFile(path.c_str());
+				loaded_music.push_back(path);
+			}
+			else
+			{
+				music = engine->getSoundSource(path.c_str());
+			}
+			irrklang::ik_u32 mlseconds= engine->getSoundSource(path.c_str())->getPlayLength();
+			
+			PlayTime* play_time = compute_time(mlseconds);
+			hours = play_time->hour;
+			mins  = play_time->minutes;
+			secs  = play_time->secs;
+			delete play_time;
+			
+			engine->play2D(music);
 			play = true;
 		}
+		string text = "length = "+to_string(hours)+":"+to_string(mins)+":"+to_string(secs);
+		draw_string(text, standart,length_pos);
+		
+		
 		int input = _getch();
 		if(input == ESCAPE) 
 		{
@@ -663,7 +685,6 @@ void App::run_playing_composition(const wstring& artist,
 		engine->update();
 	}
 	
-	//delete time;
 	system("cls");
 }									  
 void App::choose_what_to_run_from_genre_menu(const wstring& genre_name)
@@ -843,18 +864,19 @@ PlayTime* App::compute_time(irrklang::ik_u32 time)
 {
 	if(time == 0) return nullptr;
 	
-	float second = 1000.0f; // 1 sec = 1000 miliseconds
-	float minute = 60.0f;   // 1 min = 60 seconds
-	float hour   = 60.0f;   // 1 hour= 60 minute
+	int second = 1000; // 1 sec = 1000 miliseconds
+	int minute = 60;   // 1 min = 60 seconds
+	int hour   = 60;   // 1 hour= 60 minute
 	
-	float total_seconds = (float)time/second;
-	float total_minutes = total_seconds/minute;
-	float total_hours   = total_minutes/hour;
+	double total_seconds = (double)time/second;
+	double total_minutes = total_seconds/60;
+	double total_hours   = total_minutes/60;
 	
-	unsigned int secs  = total_seconds  > 0.0f? (int)total_seconds :  modf(total_seconds,NULL);
-	unsigned int mins  = total_minutes  > 0.0f? (int)total_minutes : 0;
+	
+	unsigned int secs  = total_seconds  > 1.0f? (int)total_seconds%60 : 0;
+	unsigned int mins  = total_minutes  > 1.0f? (int)total_minutes : 0;
 	unsigned int hours = 0;
-	if(total_hours > 0.0f)
+	if(total_hours > 1.0f)
 	{
 		hours = (int) total_hours;
 		mins  = (int) modf(total_hours,NULL); 
