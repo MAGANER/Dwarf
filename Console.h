@@ -61,6 +61,7 @@ public:
 		ENTER  = 13,
 		MINUS  = 95,
 		PLUS   = 43,
+		SPACE  = 32,
 	};
 public:
 	Console();
