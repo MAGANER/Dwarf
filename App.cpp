@@ -603,8 +603,14 @@ void App::run_playing_composition(const wstring& artist,
 	COORD album_pos  ={4,4};
 	COORD genre_pos  ={4,5};
 	COORD volume_pos ={4,7};
-
+	COORD length_pos ={4,8};
+	
+	
+	ISound* music = nullptr;
+	
 	bool play = false;
+	bool pause= false;
+	bool space_isnt_pressed = true;
 	while(true)
 	{
 		int volume = engine->getSoundVolume()*100.0f;
@@ -617,13 +623,13 @@ void App::run_playing_composition(const wstring& artist,
 		draw_string(L"Album:"+album,standart,album_pos);
 		draw_string(L"Genre:"+genre,standart,genre_pos);
 		draw_string("volume:"+volume_str+"% ",standart,volume_pos);
+	
 		
 		if(!play)
 		{
-			engine->play2D(path.c_str(),false);
+			music = engine->play2D(path.c_str(),false);
 			play = true;
 		}
-		
 		int input = _getch();
 		if(input == ESCAPE) 
 		{
@@ -640,8 +646,24 @@ void App::run_playing_composition(const wstring& artist,
 		{
 			if(val > 0.0f) engine->setSoundVolume(val-0.01f);
 		}
+		if(input == SPACE && !pause && space_isnt_pressed) 
+		{
+			engine->setAllSoundsPaused(true); 
+			pause = true;
+			space_isnt_pressed = false;
+		}
+		if(input == SPACE &&  pause && space_isnt_pressed) 
+		{
+			engine->setAllSoundsPaused(false);
+			pause = false;
+			space_isnt_pressed = false;
+		}
+		
+		space_isnt_pressed = true;
+		engine->update();
 	}
 	
+	//delete time;
 	system("cls");
 }									  
 void App::choose_what_to_run_from_genre_menu(const wstring& genre_name)
@@ -816,4 +838,27 @@ string App::convert_wstring_to_std(const wstring& str)
 		new_str+=new_ch;
 	}
 	return new_str;
+}
+PlayTime* App::compute_time(irrklang::ik_u32 time)
+{
+	if(time == 0) return nullptr;
+	
+	float second = 1000.0f; // 1 sec = 1000 miliseconds
+	float minute = 60.0f;   // 1 min = 60 seconds
+	float hour   = 60.0f;   // 1 hour= 60 minute
+	
+	float total_seconds = (float)time/second;
+	float total_minutes = total_seconds/minute;
+	float total_hours   = total_minutes/hour;
+	
+	unsigned int secs  = total_seconds  > 0.0f? (int)total_seconds :  modf(total_seconds,NULL);
+	unsigned int mins  = total_minutes  > 0.0f? (int)total_minutes : 0;
+	unsigned int hours = 0;
+	if(total_hours > 0.0f)
+	{
+		hours = (int) total_hours;
+		mins  = (int) modf(total_hours,NULL); 
+	}
+	
+	return new PlayTime(hours,mins,secs);	
 }

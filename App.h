@@ -13,6 +13,7 @@
 #include "fileref.h"
 #include "tag.h"
 #include "MusicData.h"
+#include "PlayTime.h"
 #include "irrKlang.h"
 
 namespace fs = std::filesystem;
@@ -77,7 +78,7 @@ public:
 	void run();
 private:
 
-	//config staff
+	//config stuff
 	void load_config();
 	Pos get_terminal_size();
 	int get_max_path_char_number();
@@ -85,35 +86,35 @@ private:
 	void set_terminal_size();
 	//.
 	
-	//path staff
+	//path stuff
 	svector get_searching_paths();
 	void get_music_files();
 	bool is_extension_able(const wstring& extension);
 	wstring fix_path_slash(const wstring& path);
 	//.
 	
-	//error staff 
+	//error stuff 
 	void write_error_log_file(const string& error);
 	void process_error(const string& error);
 	//.
 	
-	//main menu staff
+	//main menu stuff
 	void draw_label();
 	void draw_help();
 	void run_main_menu();
 	//.
 	
-	//adding menu staff
+	//adding menu stuff
 	void run_add_menu();
 	string get_path();
 	void add_new_search_paths(const string& value);
 	//.
 	
-	//searching menu staff
+	//searching menu stuff
 	void run_search_menu();
 	//.
 	
-	//listing menu staff	
+	//listing menu stuff	
 	void run_common_list(const wsvector& data,
 						 int& choosen_option,
 						 const string& no_elems_text,
@@ -158,9 +159,10 @@ private:
 	wspvector get_title_data_from_music(const wstring& album);
 	//.
 	
-	//common staff
+	//common stuff
 	void run_mode();
 	void set_mode(int input_code);
+	PlayTime* compute_time(irrklang::ik_u32 time);
 	//.
 	
 	//converting
