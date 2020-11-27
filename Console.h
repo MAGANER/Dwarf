@@ -62,6 +62,8 @@ public:
 		MINUS  = 95,
 		PLUS   = 43,
 		SPACE  = 32,
+		R      = 114,
+		N      = 110,
 	};
 public:
 	Console();

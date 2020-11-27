@@ -10,6 +10,8 @@
 #include<algorithm>
 #include<cwchar>
 #include<utility>
+#include<thread>
+#include<functional>
 #include "fileref.h"
 #include "tag.h"
 #include "MusicData.h"
@@ -30,7 +32,7 @@ typedef vector<wspair> wspvector;
 class App: public Console
 {
 private:
-	Color standart, green_label, red_label, empty;
+	Color standart, green_label, red_label, empty, magenta_label;
 	VirtualMachine machine;
 	
 	Pos size;
@@ -44,6 +46,9 @@ private:
 	
 	ISoundEngine* engine;
 	svector loaded_music;
+	
+	wspvector current_play_list;
+	int current_play_list_pos;
 	
 	enum working_modes
 	{
@@ -141,7 +146,8 @@ private:
 	void run_list_artists(const wstring& genre);
 	void run_list_albums(const wstring& genre,const wstring& artist);
 	void run_list_titles(const wstring& genre,const wstring& artist, const wstring& album);
-	void run_playing_composition(const wstring& artist, 
+	void run_playing_composition(bool& play_next,
+								 const wstring& artist, 
 								 const wstring& album,
 								 const wspair& title);
 	//.

@@ -2,7 +2,7 @@ CPP      = g++.exe
 IRK_KLANG_INCS = -I"E:/irrKlang/include/"
 TAGLIB_INCS = -I"E:/taglib-1.10/taglib/" -I"E:/taglib-1.10/taglib/toolkit/" -I"E:/taglib-1.10/build/"
 INCS     = -I"E:/cpp_projects/DwarfAudioPlayer" $(TAGLIB_INCS) $(IRK_KLANG_INCS)
-FLAG     = $(INCS) -std=c++17 -g3 
+FLAG     = $(INCS) -std=c++17 -pthread -g3 
 
 irk_klang_lib     = E:/irrKlang/lib/Win32-gcc/libirrKlang.a
 taglib_path       = E:/taglib-1.10/build/taglib/libtag.dll.a

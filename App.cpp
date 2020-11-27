@@ -10,6 +10,7 @@ App::App()
 	standart    = Color(ColorCode::Black,ColorCode::White);
 	green_label = Color(ColorCode::Black,ColorCode::Green);
 	red_label   = Color(ColorCode::Black,ColorCode::Red);
+	magenta_label=Color(ColorCode::Black,ColorCode::Magenta);
 	empty       = Color(ColorCode::Black,ColorCode::Black);
 	
 	able_extensions = {L"mp3"};
@@ -502,12 +503,22 @@ void App::run_list_titles(const wstring& genre,const wstring& artist, const wstr
 	else titles = get_title_data_from_music(album);
 	
 	for(auto t:titles) titles_only.push_back(t.first);
+	current_play_list = titles;
 	
 	int choosen_option = -1;
 	int current_elem = 0;
 	int start_counter = 0;
 	int max_counter   = titles.size()< visible_range? titles.size():visible_range;
 	
+	bool play_next = false;
+	
+	auto play = [&]()
+	{
+		system("cls");
+		current_play_list_pos = current_elem+1;
+		run_playing_composition(play_next,artist,album,titles[current_elem]);
+		choosen_option = -1;
+	};
 	while(true)
 	{
 		run_common_list(titles_only,
@@ -520,9 +531,14 @@ void App::run_list_titles(const wstring& genre,const wstring& artist, const wstr
 		if(choosen_option == -2) break;
 		if(choosen_option == current_elem)
 		{
-			system("cls");
-			run_playing_composition(artist,album,titles[current_elem]);
-			choosen_option = -1;
+			play();
+		}
+		if(play_next)
+		{
+			current_elem++;
+			choosen_option = current_elem;
+			play_next = false;
+			play();
 		}
 	}
 	system("cls");
@@ -587,11 +603,12 @@ void App::run_common_choosing_list(const wsvector& text,
 		pos.X = 10;
 	}	
 }
-void App::run_playing_composition(const wstring& artist,
+void App::run_playing_composition(bool& play_next,
+								  const wstring& artist,
 								  const wstring& album,
 								  const wspair& title)
 {	
-	wstring genre = get_genre_of_title(artist,album,title.first);
+	wstring _genre = get_genre_of_title(artist,album,title.first);
 	wstring _path = title.second;
 	string  path  = convert_wstring_to_std(_path); 
 	
@@ -605,16 +622,29 @@ void App::run_playing_composition(const wstring& artist,
 	COORD volume_pos ={4,7};
 	COORD length_pos ={4,8};
 	COORD curr_pos_pos={4,9};
+	COORD next_pos   ={4,10};
 	
-	COORD help1 = {5,15};
-	COORD help2 = {5,16};
+	COORD play_next_pos = {4,12};
+	COORD repeat_pos    ={4,13};
+	COORD pause_pos     ={4,14};
+
+	COORD help1 = {5,18};
+	COORD help2 = {5,19};
+	COORD help3 = {5,20};
+	COORD help4 = {5,21};
+	
 	
 	ISoundSource* music = nullptr;
 	unsigned int hours, mins, secs;
 	
+	bool repeat = false;
+	bool play_next_after_finishing = true;
 	bool play = false;
 	bool pause= false;
 	bool space_isnt_pressed = true;
+	bool n_isnt_pressed     = true;
+	bool r_isnt_pressed      = true;
+	
 	while(true)
 	{
 		int volume = engine->getSoundVolume()*100.0f;
@@ -625,11 +655,34 @@ void App::run_playing_composition(const wstring& artist,
 		draw_string(L"Title:"+title.first,standart,title_pos);
 		draw_string(L"Artist:"+artist,standart,artist_pos);
 		draw_string(L"Album:"+album,standart,album_pos);
-		draw_string(L"Genre:"+genre,standart,genre_pos);
+		draw_string(L"Genre:"+_genre,standart,genre_pos);
 		draw_string("volume:"+volume_str+"% ",standart,volume_pos);
+		
 		draw_string("+/- to change volume",green_label,help1);
 		draw_string("SPACE to pause/unpause",green_label,help2);
-				
+		draw_string("r to set repeat on/off",green_label,help3);
+		draw_string("n to play/(not) next song",green_label,help4);
+		
+		
+		if(current_play_list_pos < current_play_list.size())
+		{
+			wstring next_song = current_play_list[current_play_list_pos].first;
+			draw_string(L"next:"+next_song,standart,next_pos);
+		}
+		else
+		{
+			draw_string("next:None",standart,next_pos);
+		}
+		
+		string play_next_option = play_next_after_finishing?"on  ":"off ";
+		draw_string("play next after current song:"+play_next_option,magenta_label,play_next_pos);
+		
+		string repeat_option = repeat?"on  ":"off ";
+		draw_string("repeat:"+repeat_option,magenta_label,repeat_pos);
+		
+		string pause_option = pause?"on  ":"off ";
+		draw_string("pause:"+pause_option,magenta_label,pause_pos);
+		
 		if(!play)
 		{
 			bool is_loaded_already = find(loaded_music.begin(),loaded_music.end(),path) != loaded_music.end();
@@ -653,46 +706,83 @@ void App::run_playing_composition(const wstring& artist,
 			engine->play2D(music);
 			play = true;
 		}
-		string text = "length = "+to_string(hours)+":"+to_string(mins)+":"+to_string(secs);
-		draw_string(text, standart,length_pos);
-		
-		
-		
-		int input = _getch();
-		if(input == ESCAPE) 
+		string _text = "length = "+to_string(hours)+":"+to_string(mins)+":"+to_string(secs);
+		draw_string(_text,standart,length_pos);
+
+
+		if(!engine->isCurrentlyPlaying(music) && repeat) engine->play2D(music);
+		if(!engine->isCurrentlyPlaying(music) && !repeat && play_next_after_finishing)
 		{
-			engine->stopAllSounds();
+			play_next = true;
 			break;
 		}
 		
-		float val = engine->getSoundVolume();
-		if(input == PLUS)
+		if(kbhit())
 		{
-			if(val < 1.0f) engine->setSoundVolume(val+0.01f);
-		}
-		if(input == MINUS)
-		{
-			if(val > 0.0f) engine->setSoundVolume(val-0.01f);
-		}
-		if(input == SPACE && !pause && space_isnt_pressed) 
-		{
-			engine->setAllSoundsPaused(true); 
-			pause = true;
-			space_isnt_pressed = false;
-		}
-		if(input == SPACE &&  pause && space_isnt_pressed) 
-		{
-			engine->setAllSoundsPaused(false);
-			pause = false;
-			space_isnt_pressed = false;
+			int input = _getch();
+		
+			if(input == ESCAPE) 
+			{
+				engine->stopAllSounds();
+				break;
+			}
+		
+			float val = engine->getSoundVolume();
+			if(input == PLUS)
+			{
+				if(val < 1.0f) engine->setSoundVolume(val+0.01f);
+			}
+			if(input == MINUS)
+			{
+				if(val > 0.0f) engine->setSoundVolume(val-0.01f);
+			}
+		
+			if(input == SPACE && !pause && space_isnt_pressed) 
+			{
+				engine->setAllSoundsPaused(true); 
+				pause = true;
+				space_isnt_pressed = false;
+			}
+			if(input == SPACE &&  pause && space_isnt_pressed) 
+			{
+				engine->setAllSoundsPaused(false);
+				pause = false;
+				space_isnt_pressed = false;
+			}
+		
+			if(input == R && !repeat && r_isnt_pressed)
+			{
+				repeat = true;
+				r_isnt_pressed = false;
+			}
+			if(input == R && repeat && r_isnt_pressed)
+			{
+				repeat = false;
+				r_isnt_pressed = false;
+			}
+		
+			if(input == N && !play_next_after_finishing && n_isnt_pressed)
+			{
+				play_next_after_finishing = true;
+				n_isnt_pressed = false;
+			}
+			if(input == N && play_next_after_finishing && n_isnt_pressed)
+			{
+				play_next_after_finishing = false;
+				n_isnt_pressed = false;
+			}
+			
+			n_isnt_pressed      = true;
+			r_isnt_pressed      = true; 
+			space_isnt_pressed  = true;
 		}
 		
-		space_isnt_pressed = true;
+		Sleep(10);
 		engine->update();
 	}
 	
 	system("cls");
-}									  
+}
 void App::choose_what_to_run_from_genre_menu(const wstring& genre_name)
 {
 	wsvector text = 
