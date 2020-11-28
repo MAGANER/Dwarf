@@ -48,8 +48,8 @@ private:
 	svector loaded_music;
 	
 	wspvector current_play_list;
-	int current_play_list_pos,
-		prev_play_list_pos;
+	int current_play_list_pos;
+	irrklang::ik_f32 volume_cash;
 	
 	enum working_modes
 	{

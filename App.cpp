@@ -24,6 +24,7 @@ App::App()
 	system("cls");
 	
 	current_mode = working_modes::MainMenu;
+	volume_cash = 1.0f;
 }
 App::~App()
 {
@@ -544,7 +545,6 @@ void App::run_list_titles(const wstring& genre,const wstring& artist, const wstr
 		if(choosen_option == -2) break;
 		if(choosen_option == current_elem)
 		{
-			prev_play_list_pos    = current_elem-1;  
 			current_play_list_pos = current_elem;
 			play();
 			choosen_option = -1;
@@ -618,6 +618,7 @@ void App::run_playing_composition(bool& play_next,
 								  const wspair& title)
 {	
 	engine = createIrrKlangDevice();
+	engine->setSoundVolume(volume_cash);
 	system("cls");
 
 	wstring _genre = get_genre_of_title(artist,album,title.first);
@@ -659,8 +660,8 @@ void App::run_playing_composition(bool& play_next,
 	
 	while(true)
 	{
-		int volume = engine->getSoundVolume()*100.0f;
-		string volume_str = to_string(volume);
+		int volume_output = engine->getSoundVolume()*100.0f;
+		string volume_str = to_string(volume_output);
 		
 		draw_string(label,red_label,label_pos);
 		
@@ -746,12 +747,21 @@ void App::run_playing_composition(bool& play_next,
 			float val = engine->getSoundVolume();
 			if(input == PLUS)
 			{
-				if(val < 1.0f) engine->setSoundVolume(val+0.01f);
+				if(val < 1.0f)
+				{					
+					engine->setSoundVolume(val+0.01f);
+					volume_cash = engine->getSoundVolume();
+				}
 			}
 			if(input == MINUS)
 			{
-				if(val > 0.0f) engine->setSoundVolume(val-0.01f);
+				if(val > 0.0f) 
+				{
+					engine->setSoundVolume(val-0.01f);
+					volume_cash = engine->getSoundVolume();
+				}
 			}
+			
 		
 			if(input == SPACE && !pause && space_isnt_pressed) 
 			{
