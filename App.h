@@ -48,7 +48,8 @@ private:
 	svector loaded_music;
 	
 	wspvector current_play_list;
-	int current_play_list_pos;
+	int current_play_list_pos,
+		prev_play_list_pos;
 	
 	enum working_modes
 	{
@@ -78,6 +79,7 @@ private:
 	};
 
 	const int visible_range = 28;
+	bool play_next = false;
 public:
 	App();
 	~App();

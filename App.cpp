@@ -24,12 +24,9 @@ App::App()
 	system("cls");
 	
 	current_mode = working_modes::MainMenu;
-	
-	engine = createIrrKlangDevice();
 }
 App::~App()
 {
-	delete engine;
 }
 
 void App::run()
@@ -37,6 +34,7 @@ void App::run()
 	while(true)
 	{
 		run_mode();
+	
 		int input = _getch();
 		set_mode(input);
 		system("cls");
@@ -129,6 +127,7 @@ void App::set_mode(int input_code)
 		break;
 		case 52: current_mode = working_modes::Add;
 		break;
+		default:break;
 	};
 }
 void App::load_config()
@@ -295,7 +294,6 @@ void App::run_base_menu_list()
 			if(current == Albums) run_list_albums(L"",L"");
 			break;
 		}
-		
 		pos.Y = 5;
 		pos.X = 20;
 	}
@@ -311,16 +309,13 @@ void App::run_common_list(const wsvector& data,
 						  int& max_counter,
 						  const string& title)
 {
+	system("cls");
 	COORD title_pos{0,0};
-	draw_string(title,red_label,title_pos);
 	COORD elem_pos{2,1};
-	if(data.empty())
+	
+	auto draw = [&]() 
 	{
-		COORD pos{10,5};
-		draw_string(no_elems_text,standart,pos);
-	}
-	else
-	{
+		draw_string(title,red_label,title_pos);
 		for(int i = start_counter;i<max_counter;++i)
 		{
 			auto curr = data[i];
@@ -341,8 +336,18 @@ void App::run_common_list(const wsvector& data,
 				
 			++elem_pos.Y;
 		}
+		elem_pos.Y = 1;
+	};
+	
+	if(data.empty())
+	{
+		COORD pos{10,5};
+		draw_string(no_elems_text,standart,pos);
 	}
-		
+	else
+	{
+		draw();
+	}
 	int input = _getch();
 	if(input == ESCAPE) choosen_option = -2;
 	if(input == MINUS && current_elem != 0) --current_elem;
@@ -358,19 +363,8 @@ void App::run_common_list(const wsvector& data,
 		--start_counter;
 	}
 	if(input == ENTER) choosen_option = current_elem;
-
-	elem_pos.Y = 1;
 	
-	//clear all
-	//write this istead of system clearing
-	//because it blinks
-	COORD clear_pos{0,0};
-	for(int i = start_counter;i<max_counter+2;++i)
-	{
-		draw_string(string(100,' '),empty,clear_pos);
-		clear_pos.Y++;
-	}
-	clear_pos.Y = 0;
+	draw();
 }
 void App::run_list_groups()
 {
@@ -435,12 +429,14 @@ void App::run_list_genres()
 						max_counter,
 						"Genres:");
 		if(choosen_option == -2) break;
-		if(choosen_option > 0)
+		if(choosen_option == current_elem)
 		{
+			system("cls");
 			choose_what_to_run_from_genre_menu(genres[choosen_option]);
 			choosen_option = -1;
 		}
 	}
+	system("cls");
 }
 void App::run_list_artists(const wstring& genre)
 {
@@ -450,23 +446,32 @@ void App::run_list_artists(const wstring& genre)
 	
 	int start_counter = 0;
 	int current_elem  = 0;
+	bool started = true;
 	
 	while(true)
 	{
-		run_common_list(artists,
-						choosen_option,
-						"there is no any artist!",
-						current_elem,
-						start_counter,
-						max_counter,
-						"Artists:");
+		draw_string(to_string(play_next),standart,COORD{20,0});
+		if(kbhit() || started)
+		{
+			run_common_list(artists,
+							choosen_option,
+							"there is no any artist!",
+							current_elem,
+							start_counter,
+							max_counter,
+							"Artists:");
+			started = false;
+		}
 		if(choosen_option == -2) break;
 		if(choosen_option == current_elem)
-		{			
+		{		
+			system("cls");
 			choose_what_to_run_from_artist_menu(artists[current_elem],genre);
+			started = true;
 			choosen_option = -1;
 		}
 	}
+	system("cls");
 }
 void App::run_list_albums(const wstring& genre,const wstring& artist)
 {
@@ -493,6 +498,7 @@ void App::run_list_albums(const wstring& genre,const wstring& artist)
 			choosen_option = -1;
 		}
 	}
+	system("cls");
 }
 void App::run_list_titles(const wstring& genre,const wstring& artist, const wstring& album)
 {
@@ -510,35 +516,38 @@ void App::run_list_titles(const wstring& genre,const wstring& artist, const wstr
 	int start_counter = 0;
 	int max_counter   = titles.size()< visible_range? titles.size():visible_range;
 	
-	bool play_next = false;
 	
 	auto play = [&]()
 	{
 		system("cls");
-		current_play_list_pos = current_elem+1;
 		run_playing_composition(play_next,artist,album,titles[current_elem]);
-		choosen_option = -1;
 	};
+	
 	while(true)
 	{
-		run_common_list(titles_only,
-						choosen_option,
-						"there is no any composition!",
-						current_elem,
-						start_counter,
-						max_counter,
-						"Compositions:");
-		if(choosen_option == -2) break;
-		if(choosen_option == current_elem)
+		if(!play_next)
 		{
-			play();
+			run_common_list(titles_only,
+							choosen_option,
+							"there is no any composition!",
+							current_elem,
+							start_counter,
+							max_counter,
+							"Compositions:");
 		}
-		if(play_next)
+		else
 		{
 			current_elem++;
 			choosen_option = current_elem;
-			play_next = false;
+		}
+		
+		if(choosen_option == -2) break;
+		if(choosen_option == current_elem)
+		{
+			prev_play_list_pos    = current_elem-1;  
+			current_play_list_pos = current_elem;
 			play();
+			choosen_option = -1;
 		}
 	}
 	system("cls");
@@ -608,6 +617,9 @@ void App::run_playing_composition(bool& play_next,
 								  const wstring& album,
 								  const wspair& title)
 {	
+	engine = createIrrKlangDevice();
+	system("cls");
+
 	wstring _genre = get_genre_of_title(artist,album,title.first);
 	wstring _path = title.second;
 	string  path  = convert_wstring_to_std(_path); 
@@ -664,9 +676,10 @@ void App::run_playing_composition(bool& play_next,
 		draw_string("n to play/(not) next song",green_label,help4);
 		
 		
-		if(current_play_list_pos < current_play_list.size())
+		bool can_play_next = current_play_list_pos+1 < current_play_list.size();
+		if(can_play_next)
 		{
-			wstring next_song = current_play_list[current_play_list_pos].first;
+			wstring next_song = current_play_list[current_play_list_pos+1].first;
 			draw_string(L"next:"+next_song,standart,next_pos);
 		}
 		else
@@ -711,11 +724,12 @@ void App::run_playing_composition(bool& play_next,
 
 
 		if(!engine->isCurrentlyPlaying(music) && repeat) engine->play2D(music);
-		if(!engine->isCurrentlyPlaying(music) && !repeat && play_next_after_finishing)
+		if(!engine->isCurrentlyPlaying(music) && !repeat && play_next_after_finishing && can_play_next)
 		{
 			play_next = true;
 			break;
 		}
+		if(!engine->isCurrentlyPlaying(music) && repeat && !can_play_next) break;
 		
 		if(kbhit())
 		{
@@ -724,6 +738,8 @@ void App::run_playing_composition(bool& play_next,
 			if(input == ESCAPE) 
 			{
 				engine->stopAllSounds();
+				engine->drop();
+				play_next = false;
 				break;
 			}
 		
@@ -809,6 +825,7 @@ void App::choose_what_to_run_from_genre_menu(const wstring& genre_name)
 }
 void App::choose_what_to_run_from_artist_menu(const wstring& artist,const wstring& genre)
 {
+	system("cls");
 	wsvector text = 
 	{
 		L"What you want to see from "+artist+L":",
@@ -820,9 +837,12 @@ void App::choose_what_to_run_from_artist_menu(const wstring& artist,const wstrin
 	int min = 1;
 	int max = 2;
 	int current = 1;
+	
+	bool started = true;
 	while(true)
 	{
 		run_common_choosing_list(text,min,max,current,choosen_option);
+		started = false;
 		if(choosen_option == 1) run_list_albums(L"",artist);
 		if(choosen_option == 2) run_list_titles(L"",artist,L"");
 		if(choosen_option == -2) break;
