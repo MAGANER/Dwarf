@@ -743,13 +743,14 @@ void App::run_playing_composition(bool& play_next,
 		draw_string(_text,standart,length_pos);
 
 
-		if(!engine->isCurrentlyPlaying(music) && repeat) engine->play2D(music);
-		if(!engine->isCurrentlyPlaying(music) && !repeat && play_next_after_finishing && can_play_next)
+		bool nothing_to_play = !engine->isCurrentlyPlaying(music); 
+		if(nothing_to_play && repeat) engine->play2D(music);
+		if(nothing_to_play && !repeat && play_next_after_finishing && can_play_next)
 		{
 			play_next = true;
 			break;
 		}
-		if(!engine->isCurrentlyPlaying(music) && repeat && !can_play_next) break;
+		if(nothing_to_play && !can_play_next) break;
 		
 		if(kbhit())
 		{
