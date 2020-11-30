@@ -427,6 +427,7 @@ void App::run_list_groups()
 void App::run_list_genres()
 {
 	wsvector genres = get_genre_data_from_music();
+	sort(genres.begin(),genres.end());
 
 	int choosen_option = -1;
 		
