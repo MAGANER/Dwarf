@@ -1,6 +1,6 @@
 #ifndef APP_H
 #define APP_H
-#include"Console.h"
+#include"CommonMenu.h"
 #include"VirtualMachine/VirtualMachine.h"
 #include<cstdlib>
 #include<filesystem>
@@ -10,7 +10,6 @@
 #include<algorithm>
 #include<cwchar>
 #include<utility>
-#include<thread>
 #include<functional>
 #include "fileref.h"
 #include "tag.h"
@@ -29,10 +28,9 @@ typedef vector<wstring> wsvector;
 typedef pair<wstring,wstring> wspair;
 typedef vector<wspair> wspvector;
 
-class App: public Console
+class App: public CommonMenu
 {
 private:
-	Color standart, green_label, red_label, empty, magenta_label;
 	VirtualMachine machine;
 	
 	Pos size;
@@ -128,20 +126,6 @@ private:
 	//.
 	
 	//listing menu stuff	
-	void run_common_list(const wsvector& data,
-						 int& choosen_option,
-						 const string& no_elems_text,
-						 int& current_elem,
-						 int& start_counter,
-						 int& max_counter,
-						 const string& title);
-						 
-	void run_common_choosing_list(const wsvector& text,
-								  int& min,
-								  int& max,
-								  int& current,
-								  int& choosen_option);
-	
 	void run_base_menu_list();
 	void run_list_menu();
 	void run_list_groups();
@@ -178,11 +162,6 @@ private:
 	void set_mode(int input_code);
 	PlayTime* compute_time(irrklang::ik_u32 time);
 	wstring clear_string(const wstring& str);
-	//.
-	
-	//converting
-	bool can_wstring_be_converted_to_std(const wstring& str);
-	string convert_wstring_to_std(const wstring& str);
 	//.
 	
 };
