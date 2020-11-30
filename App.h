@@ -16,6 +16,7 @@
 #include "MusicData.h"
 #include "PlayTime.h"
 #include "irrKlang.h"
+#pragma execution_character_set( "utf-8" )
 
 namespace fs = std::filesystem;
 using namespace Bubblegum;
@@ -38,6 +39,8 @@ private:
 	
 	svector searching_paths;
 	vector<MusicData*> music;
+	wsvector raw_music;
+	
 	svector groups;
 	
 	wsvector able_extensions;

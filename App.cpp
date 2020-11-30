@@ -237,8 +237,20 @@ void App::get_music_files()
 					wstring album  = tag->album().toWString();
 					wstring genre  = tag->genre().toWString();
 					unsigned int year= tag->year();
-					MusicData* data = new MusicData(artist,title,album,genre,str,year);
-					music.push_back(data);
+					
+					bool empty = artist.empty() || 
+								 title.empty()  ||
+								 album.empty()  ||
+								 genre.empty();
+					if(empty)
+					{
+						raw_music.push_back(str);
+					}
+					else
+					{
+						MusicData* data = new MusicData(artist,title,album,genre,str,year);
+						music.push_back(data);
+					}
 				}
 			}
 		}
