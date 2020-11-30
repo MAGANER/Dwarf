@@ -80,6 +80,8 @@ private:
 
 	const int visible_range = 28;
 	bool play_next = false;
+	
+	bool smart_search, smart_sort;
 public:
 	App();
 	~App();
@@ -90,6 +92,8 @@ private:
 	void load_config();
 	Pos get_terminal_size();
 	int get_max_path_char_number();
+	bool is_smart_sort_enabled();
+	bool is_smart_search_enabled();
 	
 	void set_terminal_size();
 	//.
@@ -97,6 +101,7 @@ private:
 	//path stuff
 	svector get_searching_paths();
 	void get_music_files();
+	void apply_smart_sort();
 	bool is_extension_able(const wstring& extension);
 	wstring fix_path_slash(const wstring& path);
 	//.
@@ -172,6 +177,8 @@ private:
 	void run_mode();
 	void set_mode(int input_code);
 	PlayTime* compute_time(irrklang::ik_u32 time);
+	wstring clear_string(const wstring& str);
+	bool is_ch_lower(const wstring& str1, const wstring& str2);
 	//.
 	
 	//converting

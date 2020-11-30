@@ -16,6 +16,8 @@ App::App()
 	able_extensions = {L"mp3"};
 	
 	load_config();
+	smart_search = is_smart_search_enabled();
+	smart_sort   = is_smart_sort_enabled();
 	searching_paths = get_searching_paths();
 	get_music_files();
 	size = get_terminal_size();
@@ -143,6 +145,18 @@ Pos App::get_terminal_size()
 	string swidth = main->memory.get_value("width",TypeChecker::Integer);
 	string sheight= main->memory.get_value("height",TypeChecker::Integer);
 	return Pos(atoi(swidth.c_str()),atoi(sheight.c_str()));
+}
+bool App::is_smart_sort_enabled()
+{
+	Module* main = machine.get_module("main");
+	string option= main->memory.get_value("smart_sort_enabled",TypeChecker::Bool);
+	return option=="true"?true:false;
+}
+bool App::is_smart_search_enabled()
+{
+	Module* main = machine.get_module("main");
+	string option= main->memory.get_value("smart_search_enabled",TypeChecker::Bool);
+	return option=="true"?true:false;
 }
 int App::get_max_path_char_number()
 {
@@ -442,6 +456,8 @@ void App::run_list_genres()
 void App::run_list_artists(const wstring& genre)
 {
 	wsvector artists   = get_artists_data_from_music(genre);
+	sort(artists.begin(),artists.end());
+	
 	int max_counter    = artists.size() < visible_range? artists.size():visible_range;
 	int choosen_option = -1;
 	
@@ -451,7 +467,6 @@ void App::run_list_artists(const wstring& genre)
 	
 	while(true)
 	{
-		draw_string(to_string(play_next),standart,COORD{20,0});
 		if(kbhit() || started)
 		{
 			run_common_list(artists,
@@ -477,6 +492,7 @@ void App::run_list_artists(const wstring& genre)
 void App::run_list_albums(const wstring& genre,const wstring& artist)
 {
 	wsvector albums = get_album_data_from_music(artist,genre);
+	sort(albums.begin(),albums.end());
 	
 	int choosen_option = -1;
 	int current_elem = 0;
@@ -511,6 +527,7 @@ void App::run_list_titles(const wstring& genre,const wstring& artist, const wstr
 	
 	for(auto t:titles) titles_only.push_back(t.first);
 	current_play_list = titles;
+	sort(current_play_list.begin(),current_play_list.end());
 	
 	int choosen_option = -1;
 	int current_elem = 0;
@@ -1009,4 +1026,20 @@ PlayTime* App::compute_time(irrklang::ik_u32 time)
 	}
 	
 	return new PlayTime(hours,mins,secs);	
+}
+wstring App::clear_string(const wstring& str)
+{
+	wstring cleared;
+	for(auto& ch: str)
+	{
+		if(!isspace(ch))
+			cleared.push_back(tolower(ch));
+	}
+	return cleared;
+}
+bool App::is_ch_lower(const wstring& str1, const wstring& str2)
+{
+	int ch1 = str1[0];
+	int ch2 = str2[0];
+	return ch1 < ch2;
 }
