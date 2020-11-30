@@ -1,19 +1,22 @@
 (printl "load config...")
 
 #the window size#
-(defvar width 640)
-(defvar height 400)
+(defvar width 840)
+(defvar height 410)
 (defvar path_char_max 100)
 
 (defvar incorrect_width_too_low (> 0 $width))
-(defvar incorrect_width_too_high (> $width 641))
+(defvar incorrect_width_too_high (> $width 841))
 (defvar incorrect_width (or $incorrect_width_too_high $incorrect_width_too_low))
 
 (defvar incorrect_height_too_low (> 0 $height))
-(defvar incorrect_height_too_high (> $height 401))
+(defvar incorrect_height_too_high (> $height 431))
 (defvar incorrect_height (or $incorrect_height_too_high $incorrect_height_too_low))
 
 (defvar path_char_max_is_incorrect (> 0 $path_char_max))
+
+(defvar smart_sort_enabled true)
+(defvar smart_search_enabled true)
 
 (defn die (a)
   (printl $a)
