@@ -178,7 +178,6 @@ private:
 	void set_mode(int input_code);
 	PlayTime* compute_time(irrklang::ik_u32 time);
 	wstring clear_string(const wstring& str);
-	bool is_ch_lower(const wstring& str1, const wstring& str2);
 	//.
 	
 	//converting

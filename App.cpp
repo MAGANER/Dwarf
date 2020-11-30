@@ -364,6 +364,8 @@ void App::run_common_list(const wsvector& data,
 		draw();
 	}
 	int input = _getch();
+	system("cls");
+	
 	if(input == ESCAPE) choosen_option = -2;
 	if(input == MINUS && current_elem != 0) --current_elem;
 	if(input == PLUS  && current_elem < max_counter-1)++current_elem;
@@ -528,7 +530,6 @@ void App::run_list_titles(const wstring& genre,const wstring& artist, const wstr
 	
 	for(auto t:titles) titles_only.push_back(t.first);
 	current_play_list = titles;
-	sort(current_play_list.begin(),current_play_list.end());
 	
 	int choosen_option = -1;
 	int current_elem = 0;
@@ -1037,10 +1038,4 @@ wstring App::clear_string(const wstring& str)
 			cleared.push_back(tolower(ch));
 	}
 	return cleared;
-}
-bool App::is_ch_lower(const wstring& str1, const wstring& str2)
-{
-	int ch1 = str1[0];
-	int ch2 = str2[0];
-	return ch1 < ch2;
 }
