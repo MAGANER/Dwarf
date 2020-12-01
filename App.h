@@ -2,21 +2,12 @@
 #define APP_H
 #include"Player.h"
 #include"VirtualMachine/VirtualMachine.h"
-#include<cstdlib>
 #include<filesystem>
 #include<vector>
 #include<fstream>
-#include<clocale>
-#include<algorithm>
-#include<cwchar>
-#include<utility>
-#include<functional>
-#include<locale>
 #include "fileref.h"
 #include "tag.h"
-#include "MusicData.h"
-#include "PlayTime.h"
-#include "irrKlang.h"
+
 
 namespace fs = std::filesystem;
 using namespace Bubblegum;
