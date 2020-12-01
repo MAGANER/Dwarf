@@ -1,6 +1,6 @@
 #ifndef APP_H
 #define APP_H
-#include"CommonMenu.h"
+#include"Player.h"
 #include"VirtualMachine/VirtualMachine.h"
 #include<cstdlib>
 #include<filesystem>
@@ -25,11 +25,7 @@ using namespace irrklang;
 
 namespace Dwarf
 {
-typedef vector<wstring> wsvector;
-typedef pair<wstring,wstring> wspair;
-typedef vector<wspair> wspvector;
-
-class App: public CommonMenu
+class App: public Player
 {
 private:
 	VirtualMachine machine;
@@ -44,14 +40,7 @@ private:
 	svector groups;
 	
 	wsvector able_extensions;
-	
-	ISoundEngine* engine;
-	svector loaded_music;
-	
-	wspvector current_play_list;
-	int current_play_list_pos;
-	irrklang::ik_f32 volume_cash;
-	
+			
 	enum working_modes
 	{
 		MainMenu,
@@ -78,10 +67,6 @@ private:
 		Genre
 		
 	};
-
-	const int visible_range = 28;
-	bool play_next = false;
-	
 	bool smart_search, smart_sort;
 public:
 	App();
@@ -139,31 +124,21 @@ private:
 	
 	void run_list_artists(const wstring& genre);
 	void run_list_albums(const wstring& genre,const wstring& artist);
-	void run_list_titles(const wstring& genre,const wstring& artist, const wstring& album);
-	void run_playing_composition(bool& play_next,
-								 const wstring& artist, 
-								 const wstring& album,
-								 const wspair& title);
 	//.
 	
 	//
 	wstring get_path_to_title(const wstring& artist, 
 							   const wstring& album,
 							   const wstring& title);
-	wstring get_genre_of_title(const wstring& artist, 
-							   const wstring& album,
-							   const wstring& title);
+
 	wsvector get_genre_data_from_music();
 	wsvector get_artists_data_from_music(const wstring& genre);
 	wsvector get_album_data_from_music(const wstring& artist, const wstring& genre);
-	wspvector get_title_data_from_music(const wstring& artist, const wstring& genre);
-	wspvector get_title_data_from_music(const wstring& album);
 	//.
 	
 	//common stuff
 	void run_mode();
 	void set_mode(int input_code);
-	PlayTime* compute_time(irrklang::ik_u32 time);
 	wstring clear_string(const wstring& str);
 	//.
 	

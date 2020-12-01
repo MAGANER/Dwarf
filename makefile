@@ -6,7 +6,7 @@ FLAG     = $(INCS) -std=c++17 -pthread -g3
 
 irk_klang_lib     = E:/irrKlang/lib/Win32-gcc/libirrKlang.a
 taglib_path       = E:/taglib-1.10/build/taglib/libtag.dll.a
-objects 		  = main.o app.o console.o CommonMenu.o
+objects 		  = main.o app.o console.o CommonMenu.o Player.o
 bublegum_objects  = ErrorPrinter.o TypeChecker.o Memory.o VirtualMachine.o
 
 dwarf : $(objects) $(bublegum_objects) 
@@ -15,10 +15,12 @@ dwarf : $(objects) $(bublegum_objects)
 CommonMenu.o : CommonMenu.cpp
 	$(CPP) -c CommonMenu.cpp CommonMenu.h $(FLAG)
 
+Player.o : Player.cpp
+	$(CPP) -c Player.cpp Player.h $(FLAG)
 
-
+headers = app.h console.h MusicData.h CommonMenu.h PlayTime.h VirtualMachine/VirtualMachine.h Player.h
 app.o : app.cpp 
-	$(CPP) -c app.cpp app.h console.h MusicData.h CommonMenu.h PlayTime.h VirtualMachine/VirtualMachine.h $(FLAG)
+	$(CPP) -c app.cpp $(headers) $(FLAG)
 
 console.o : console.cpp
 	$(CPP) -c console.cpp console.h $(FLAG)

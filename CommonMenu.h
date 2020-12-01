@@ -17,7 +17,7 @@ class CommonMenu: public Console
 {
 protected:
 	Color standart, green_label, red_label, empty, magenta_label;
-	
+	const int visible_range = 28;
 protected:
 	bool can_wstring_be_converted_to_std(const wstring& str);
 	string convert_wstring_to_std(const wstring& str);
