@@ -67,7 +67,7 @@ public:
 	};
 public:
 	Console();
-	~Console();
+	virtual ~Console();
 	
 	void draw_string(const string& str, const Color& color, const COORD& pos);
 	void draw_string(const wstring& str, const Color& color, const COORD& pos);

@@ -92,7 +92,6 @@ void CommonMenu::run_common_choosing_list(const wsvector& text,
 		for(size_t i = 0;i<text.size();++i)
 		{
 			auto curr = text[i];
-			
 			if(i == 1)
 			{
 				pos.X = 25;

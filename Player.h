@@ -12,7 +12,7 @@ namespace Dwarf
 typedef pair<wstring,wstring> wspair;
 typedef vector<wspair> wspvector;	
 
-class Player : public CommonMenu
+class Player : public virtual CommonMenu
 {
 protected:
 	ISoundEngine* engine;
@@ -25,7 +25,7 @@ protected:
 	irrklang::ik_f32 volume_cash;
 public:
 	Player();
-	~Player();
+	virtual ~Player();
 	
 	void run_list_titles(const vector<MusicData*>& data,
 						 const wstring& genre,

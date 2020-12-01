@@ -23,7 +23,7 @@ protected:
 	string convert_wstring_to_std(const wstring& str);
 public:
 	CommonMenu();
-	~CommonMenu();
+	virtual ~CommonMenu();
 
 	void run_common_list(const wsvector& data,
 						 int& choosen_option,

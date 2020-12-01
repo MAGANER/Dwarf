@@ -1,9 +1,9 @@
 #libraries
 IRK_KLANG_INCS = -I"E:/irrKlang/include/"
-irk_klang_lib     = E:/irrKlang/lib/Win32-gcc/libirrKlang.a
+irk_klang_lib  = E:/irrKlang/lib/Win32-gcc/libirrKlang.a
 
 TAGLIB_INCS = -I"E:/taglib-1.10/taglib/" -I"E:/taglib-1.10/taglib/toolkit/" -I"E:/taglib-1.10/build/"
-taglib_path       = E:/taglib-1.10/build/taglib/libtag.dll.a
+taglib      = E:/taglib-1.10/build/taglib/libtag.dll.a
 
 
 #common compiler data
@@ -18,7 +18,7 @@ bublegum_objects  = ErrorPrinter.o TypeChecker.o Memory.o VirtualMachine.o
 
 
 dwarf : $(objects) $(bublegum_objects) 
-	$(CPP) -o build/dwarf $(objects) $(bublegum_objects) $(taglib_path) $(irk_klang_lib)
+	$(CPP) -o build/dwarf $(objects) $(bublegum_objects) $(taglib) $(irk_klang_lib)
 
 #main programm
 CommonMenu.o : CommonMenu.cpp
