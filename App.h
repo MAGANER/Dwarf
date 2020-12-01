@@ -1,6 +1,6 @@
 #ifndef APP_H
 #define APP_H
-#include"AlbumMenu.h"
+#include"ArtistMenu.h"
 #include"VirtualMachine/VirtualMachine.h"
 #include<filesystem>
 #include<vector>
@@ -16,7 +16,7 @@ using namespace irrklang;
 
 namespace Dwarf
 {
-class App: public AlbumMenu
+class App: public ArtistMenu
 {
 private:
 	VirtualMachine machine;
@@ -111,9 +111,6 @@ private:
 	
 	void run_list_genres();
 	void choose_what_to_run_from_genre_menu(const wstring& genre_name);
-	void choose_what_to_run_from_artist_menu(const wstring& artist, const wstring& genre);
-	
-	void run_list_artists(const wstring& genre);
 	//.
 	
 	//
@@ -122,7 +119,6 @@ private:
 							   const wstring& title);
 
 	wsvector get_genre_data_from_music();
-	wsvector get_artists_data_from_music(const wstring& genre);
 	//.
 	
 	//common stuff

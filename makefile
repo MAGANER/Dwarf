@@ -13,7 +13,7 @@ FLAG     = $(INCS) -std=c++17 -pthread -g3
 
 
 #object files
-objects 		  = main.o app.o console.o CommonMenu.o Player.o AlbumMenu.o
+objects 		  = main.o app.o console.o CommonMenu.o Player.o AlbumMenu.o ArtistMenu.o
 bublegum_objects  = ErrorPrinter.o TypeChecker.o Memory.o VirtualMachine.o
 
 
@@ -21,6 +21,10 @@ dwarf : $(objects) $(bublegum_objects)
 	$(CPP) -o build/dwarf $(objects) $(bublegum_objects) $(taglib) $(irk_klang_lib)
 
 #main programm
+
+ArtistMenu.o : ArtistMenu.cpp
+	$(CPP) -c ArtistMenu.cpp ArtistMenu.h $(FLAG)
+
 AlbumMenu.o : AlbumMenu.cpp
 	$(CPP) -c AlbumMenu.cpp AlbumMenu.h $(FLAG)
 
@@ -30,7 +34,7 @@ CommonMenu.o : CommonMenu.cpp
 Player.o : Player.cpp
 	$(CPP) -c Player.cpp Player.h $(FLAG)
 
-headers = app.h console.h MusicData.h CommonMenu.h PlayTime.h VirtualMachine/VirtualMachine.h  Player.h  AlbumMenu.h
+headers = app.h console.h MusicData.h CommonMenu.h ArtistMenu.h PlayTime.h VirtualMachine/VirtualMachine.h  Player.h  AlbumMenu.h
 		  
 app.o : app.cpp 
 	$(CPP) -c app.cpp $(headers) $(FLAG)
