@@ -16,7 +16,6 @@
 (defvar path_char_max_is_incorrect (> 0 $path_char_max))
 
 (defvar smart_sort_enabled true)
-(defvar smart_search_enabled true)
 
 (defn die (a)
   (printl $a)

@@ -13,7 +13,7 @@ FLAG     = $(INCS) -std=c++17 -pthread -g3
 
 
 #object files
-objects 		  = main.o app.o console.o CommonMenu.o Player.o AlbumMenu.o ArtistMenu.o GenreMenu.o
+objects 		  = main.o app.o console.o CommonMenu.o Player.o AlbumMenu.o ArtistMenu.o GenreMenu.o SearchMenu.o
 bublegum_objects  = ErrorPrinter.o TypeChecker.o Memory.o VirtualMachine.o
 
 
@@ -34,10 +34,13 @@ CommonMenu.o : CommonMenu.cpp
 GenreMenu.o : GenreMenu.cpp
 	$(CPP) -c GenreMenu.cpp GenreMenu.h $(FLAG)
 
+SearchMenu.o : SearchMenu.cpp
+	$(CPP) -c SearchMenu.cpp SearchMenu.h $(FLAG)
+
 Player.o : Player.cpp
 	$(CPP) -c Player.cpp Player.h $(FLAG)
 
-headers = app.h console.h MusicData.h CommonMenu.h GenreMenu.h ArtistMenu.h PlayTime.h VirtualMachine/VirtualMachine.h  Player.h  AlbumMenu.h
+headers = app.h console.h MusicData.h CommonMenu.h SearchMenu.h GenreMenu.h ArtistMenu.h PlayTime.h VirtualMachine/VirtualMachine.h  Player.h  AlbumMenu.h
 		  
 app.o : app.cpp 
 	$(CPP) -c app.cpp $(headers) $(FLAG)

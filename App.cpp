@@ -10,7 +10,6 @@ App::App()
 	able_extensions = {L"mp3"};
 	
 	load_config();
-	smart_search = is_smart_search_enabled();
 	smart_sort   = is_smart_sort_enabled();
 	searching_paths = get_searching_paths();
 	get_music_files();
@@ -103,10 +102,17 @@ void App::run_mode()
 	system("cls");
 	switch(current_mode)
 	{
-		case working_modes::MainMenu: run_main_menu();   break;
-		case working_modes::Add:      run_add_menu();    break;
-		case working_modes::Search:   run_search_menu(); break;
-		case working_modes::List:	  run_list_menu();   break;
+		case working_modes::MainMenu: run_main_menu();     break;
+		case working_modes::Add:      run_add_menu();      break;
+		case working_modes::Search:   
+		{
+			run_search(music);
+			previos_mode = working_modes::Search;
+			current_mode = working_modes::MainMenu;
+			run_mode();
+		};
+		break;
+		case working_modes::List:	  run_base_menu_list();break;
 	}
 }
 void App::set_mode(int input_code)
@@ -143,12 +149,6 @@ bool App::is_smart_sort_enabled()
 {
 	Module* main = machine.get_module("main");
 	string option= main->memory.get_value("smart_sort_enabled",TypeChecker::Bool);
-	return option=="true"?true:false;
-}
-bool App::is_smart_search_enabled()
-{
-	Module* main = machine.get_module("main");
-	string option= main->memory.get_value("smart_search_enabled",TypeChecker::Bool);
 	return option=="true"?true:false;
 }
 int App::get_max_path_char_number()
@@ -258,17 +258,6 @@ void App::get_music_files()
 bool App::is_extension_able(const wstring& extension)
 {
 	return find(able_extensions.begin(),able_extensions.end(),extension) != able_extensions.end();
-}
-void App::run_search_menu()
-{
-	COORD pos = {5,10};
-	draw_string("look for:",standart, pos);
-	string input = get_path();
-}
-void App::run_list_menu()
-{
-	run_base_menu_list();
-
 }
 void App::run_base_menu_list()
 {
@@ -399,3 +388,39 @@ wstring App::clear_string(const wstring& str)
 	}
 	return cleared;
 }
+
+template<typename T>
+typename T::size_type App::LevenshteinDistance(const T &source,
+											   const T &target)
+{
+    if (source.size() > target.size()) {
+        return LevenshteinDistance(target, source);
+    }
+
+    using TSizeType = typename T::size_type;
+    const TSizeType min_size = source.size(), max_size = target.size();
+    std::vector<TSizeType> lev_dist(min_size + 1);
+
+    for (TSizeType i = 0; i <= min_size; ++i) {
+        lev_dist[i] = i;
+    }
+
+    for (TSizeType j = 1; j <= max_size; ++j) {
+        TSizeType previous_diagonal = lev_dist[0], previous_diagonal_save;
+        ++lev_dist[0];
+
+        for (TSizeType i = 1; i <= min_size; ++i) {
+            previous_diagonal_save = lev_dist[i];
+            if (source[i - 1] == target[j - 1]) {
+                lev_dist[i] = previous_diagonal;
+            } else {
+                lev_dist[i] = std::min(std::min(lev_dist[i - 1], lev_dist[i]), previous_diagonal) + 1;
+            }
+            previous_diagonal = previous_diagonal_save;
+        }
+    }
+
+    return lev_dist[min_size];
+}
+												   
+												   

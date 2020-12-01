@@ -1,10 +1,13 @@
 #ifndef APP_H
 #define APP_H
-#include"GenreMenu.h"
-#include"VirtualMachine/VirtualMachine.h"
+
 #include<filesystem>
 #include<vector>
 #include<fstream>
+
+#include"SearchMenu.h"
+#include"VirtualMachine/VirtualMachine.h"
+
 #include "fileref.h"
 #include "tag.h"
 
@@ -15,8 +18,8 @@ using namespace _VirtualMachine;
 using namespace irrklang;
 
 namespace Dwarf
-{
-class App: public GenreMenu
+{	
+class App: public SearchMenu
 {
 private:
 	VirtualMachine machine;
@@ -58,7 +61,7 @@ private:
 		Genre
 		
 	};
-	bool smart_search, smart_sort;
+	bool smart_sort;
 public:
 	App();
 	~App();
@@ -70,7 +73,6 @@ private:
 	Pos get_terminal_size();
 	int get_max_path_char_number();
 	bool is_smart_sort_enabled();
-	bool is_smart_search_enabled();
 	
 	void set_terminal_size();
 	//.
@@ -100,13 +102,8 @@ private:
 	void add_new_search_paths(const string& value);
 	//.
 	
-	//searching menu stuff
-	void run_search_menu();
-	//.
-	
 	//listing menu stuff	
 	void run_base_menu_list();
-	void run_list_menu();
 	void run_list_groups();
 	//.
 	
@@ -121,6 +118,12 @@ private:
 	void set_mode(int input_code);
 	wstring clear_string(const wstring& str);
 	//.
+	
+	
+	//took it from https://ru.wikibooks.org/wiki/Реализации_алгоритмов/Расстояние_Левенштейна#C++
+	template<typename T>
+	typename T::size_type LevenshteinDistance(const T &source,
+											  const T &target);
 	
 };
 };
