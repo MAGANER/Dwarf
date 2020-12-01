@@ -1,17 +1,26 @@
-CPP      = g++.exe
+#libraries
 IRK_KLANG_INCS = -I"E:/irrKlang/include/"
+irk_klang_lib     = E:/irrKlang/lib/Win32-gcc/libirrKlang.a
+
 TAGLIB_INCS = -I"E:/taglib-1.10/taglib/" -I"E:/taglib-1.10/taglib/toolkit/" -I"E:/taglib-1.10/build/"
+taglib_path       = E:/taglib-1.10/build/taglib/libtag.dll.a
+
+
+#common compiler data
 INCS     = -I"E:/cpp_projects/DwarfAudioPlayer" $(TAGLIB_INCS) $(IRK_KLANG_INCS)
+CPP      = g++.exe
 FLAG     = $(INCS) -std=c++17 -pthread -g3 
 
-irk_klang_lib     = E:/irrKlang/lib/Win32-gcc/libirrKlang.a
-taglib_path       = E:/taglib-1.10/build/taglib/libtag.dll.a
+
+#object files
 objects 		  = main.o app.o console.o CommonMenu.o Player.o
 bublegum_objects  = ErrorPrinter.o TypeChecker.o Memory.o VirtualMachine.o
+
 
 dwarf : $(objects) $(bublegum_objects) 
 	$(CPP) -o build/dwarf $(objects) $(bublegum_objects) $(taglib_path) $(irk_klang_lib)
 
+#main programm
 CommonMenu.o : CommonMenu.cpp
 	$(CPP) -c CommonMenu.cpp CommonMenu.h $(FLAG)
 
@@ -24,7 +33,11 @@ app.o : app.cpp
 
 console.o : console.cpp
 	$(CPP) -c console.cpp console.h $(FLAG)
-	
+
+main.o : main.cpp
+	$(CPP) -c main.cpp app.h $(FLAG)
+
+
 #Bubblegum
 path = VirtualMachine/
 ErrorPrinter.o : $(path)ErrorPrinter.cpp
@@ -38,9 +51,3 @@ Memory.o : $(path)Memory.cpp
 
 VirtualMachine.o : $(path)VirtualMachine.cpp
 	$(CPP) -c $(path)VirtualMachine.cpp $(path)VirtualMachine.h $(path)ErrorPrinter.h $(path)TypeChecker.h $(path)Function.h $(path)Module.h $(path)StrFunction.h $(FLAG)
-	
-window.o : TinyPDC/Window.cpp
-	$(CPP) -c TinyPDC/Window.cpp TinyPDC/Window.h $(vector_path)Vector.h $(FLAG)  
-
-main.o : main.cpp
-	$(CPP) -c main.cpp app.h $(FLAG)
