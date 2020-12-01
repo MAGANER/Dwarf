@@ -311,7 +311,7 @@ void App::run_base_menu_list()
 			if(current == Groups) run_list_groups();
 			if(current == Genres) run_list_genres();
 			if(current == Artists)run_list_artists(L"");
-			if(current == Albums) run_list_albums(L"",L"");
+			if(current == Albums) run_list_albums(music,L"",L"");
 			break;
 		}
 		pos.Y = 5;
@@ -430,34 +430,6 @@ void App::run_list_artists(const wstring& genre)
 	}
 	system("cls");
 }
-void App::run_list_albums(const wstring& genre,const wstring& artist)
-{
-	wsvector albums = get_album_data_from_music(artist,genre);
-	sort(albums.begin(),albums.end());
-	
-	int choosen_option = -1;
-	int current_elem = 0;
-	int start_counter = 0;
-	int max_counter   = albums.size()< visible_range? albums.size():visible_range;
-	
-	while(true)
-	{
-		run_common_list(albums,
-						choosen_option,
-						"there is no any album!",
-						current_elem,
-						start_counter,
-						max_counter,
-						"Albums:");
-		if(choosen_option == -2) break;
-		if(choosen_option == current_elem)
-		{	
-			run_list_titles(music,genre,artist,albums[current_elem]);
-			choosen_option = -1;
-		}
-	}
-	system("cls");
-}
 void App::choose_what_to_run_from_genre_menu(const wstring& genre_name)
 {
 	wsvector text = 
@@ -476,7 +448,7 @@ void App::choose_what_to_run_from_genre_menu(const wstring& genre_name)
 	{
 		run_common_choosing_list(text,min,max,current,choosen_option);
 		if(choosen_option == 1) run_list_artists(genre_name);
-		if(choosen_option == 2) run_list_albums(genre_name,L"");
+		if(choosen_option == 2) run_list_albums(music,genre_name,L"");
 		if(choosen_option == 3) run_list_titles(music,genre_name,L"",L"");
 		if(choosen_option == -2) break;
 	}
@@ -502,7 +474,7 @@ void App::choose_what_to_run_from_artist_menu(const wstring& artist,const wstrin
 	{
 		run_common_choosing_list(text,min,max,current,choosen_option);
 		started = false;
-		if(choosen_option == 1) run_list_albums(L"",artist);
+		if(choosen_option == 1) run_list_albums(music,L"",artist);
 		if(choosen_option == 2) run_list_titles(music,L"",artist,L"");
 		if(choosen_option == -2) break;
 	}
@@ -552,22 +524,6 @@ wsvector App::get_artists_data_from_music(const wstring& genre)
 		bool already_added = find(data.begin(),data.end(),m->artist) != data.end();
 		if(!already_added && genre.empty()) data.push_back(m->artist);
 		else if(!already_added && genre == m->genre) data.push_back(m->artist);
-	}
-	return data;
-}
-wsvector App::get_album_data_from_music(const wstring& artist, const wstring& genre)
-{
-	wsvector data;
-	for(auto& m:music)
-	{
-		bool already_added = find(data.begin(),data.end(),m->album) != data.end();
-		if(!already_added)
-		{
-			if(artist.empty()      && genre.empty())     data.push_back(m->album);
-			else if(artist.empty() && genre == m->genre) data.push_back(m->album);
-			else if(genre.empty()  && artist== m->artist)data.push_back(m->album);
-			else if(genre == m->genre && artist == m->artist) data.push_back(m->album);
-		}
 	}
 	return data;
 }
