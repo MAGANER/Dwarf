@@ -57,7 +57,7 @@ void Console::draw_string(const string& str, const Color& color, const COORD& po
 	SetConsoleTextAttribute(console, (WORD)((color.background << 4) | color.foreground ));
 	SetConsoleCursorPosition(console,pos);
 	
-	cout<<str;
+	printf(str.c_str());
 }
 void Console::draw_string(const wstring& str, const Color& color, const COORD& pos)
 {
@@ -65,9 +65,25 @@ void Console::draw_string(const wstring& str, const Color& color, const COORD& p
 	SetConsoleTextAttribute(console, (WORD)((color.background << 4) | color.foreground ));
 	SetConsoleCursorPosition(console,pos);
 	
-	wcout<<str;
+	wprintf(str.c_str());
 }
+void Console::clear() 
+{
+    COORD topLeft  = { 0, 0 };
+    HANDLE console = GetStdHandle(STD_OUTPUT_HANDLE);
+    CONSOLE_SCREEN_BUFFER_INFO screen;
+    DWORD written;
 
+    GetConsoleScreenBufferInfo(console, &screen);
+    FillConsoleOutputCharacterA(
+        console, ' ', screen.dwSize.X * screen.dwSize.Y, topLeft, &written
+    );
+    FillConsoleOutputAttribute(
+        console, FOREGROUND_GREEN | FOREGROUND_RED | FOREGROUND_BLUE,
+        screen.dwSize.X * screen.dwSize.Y, topLeft, &written
+    );
+    SetConsoleCursorPosition(console, topLeft);
+}
 
 
 

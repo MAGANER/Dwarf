@@ -9,22 +9,22 @@ taglib_path       = E:/taglib-1.10/build/taglib/libtag.dll.a
 objects 		  = main.o app.o console.o CommonMenu.o
 bublegum_objects  = ErrorPrinter.o TypeChecker.o Memory.o VirtualMachine.o
 
-dwarf : $(objects) $(bublegum_objects)
+dwarf : $(objects) $(bublegum_objects) 
 	$(CPP) -o build/dwarf $(objects) $(bublegum_objects) $(taglib_path) $(irk_klang_lib)
 
 CommonMenu.o : CommonMenu.cpp
 	$(CPP) -c CommonMenu.cpp CommonMenu.h $(FLAG)
+
+
 
 app.o : app.cpp 
 	$(CPP) -c app.cpp app.h console.h MusicData.h CommonMenu.h PlayTime.h VirtualMachine/VirtualMachine.h $(FLAG)
 
 console.o : console.cpp
 	$(CPP) -c console.cpp console.h $(FLAG)
-
-path = VirtualMachine/
-
-
+	
 #Bubblegum
+path = VirtualMachine/
 ErrorPrinter.o : $(path)ErrorPrinter.cpp
 	$(CPP) -c $(path)ErrorPrinter.cpp $(path)ErrorPrinter.h $(FLAG)
 	

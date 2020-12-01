@@ -20,7 +20,7 @@ void CommonMenu::run_common_list(const wsvector& data,
 								 int& max_counter,
 								 const string& title)
 {
-	system("cls");
+	clear();
 	COORD title_pos{0,0};
 	COORD elem_pos{2,1};
 	
@@ -60,7 +60,7 @@ void CommonMenu::run_common_list(const wsvector& data,
 		draw();
 	}
 	int input = _getch();
-	system("cls");
+	clear();
 	
 	if(input == ESCAPE) choosen_option = -2;
 	if(input == MINUS && current_elem != 0) --current_elem;
@@ -78,6 +78,7 @@ void CommonMenu::run_common_list(const wsvector& data,
 	if(input == ENTER) choosen_option = current_elem;
 	
 	draw();
+	Sleep(40);
 }
 void CommonMenu::run_common_choosing_list(const wsvector& text,
 										  int& min,

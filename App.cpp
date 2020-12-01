@@ -5,8 +5,8 @@ App::App()
 {	
 	SetConsoleOutputCP(1251);
 	system("title Dwarf");
-	system("cls");
-		
+	clear();
+	
 	able_extensions = {L"mp3"};
 	
 	load_config();
@@ -17,7 +17,7 @@ App::App()
 	size = get_terminal_size();
 	max_path_char_number = get_max_path_char_number();
 	set_terminal_size();
-	system("cls");
+	clear();
 	
 	current_mode = working_modes::MainMenu;
 	volume_cash = 1.0f;

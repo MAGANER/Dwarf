@@ -11,12 +11,12 @@
 #include<cwchar>
 #include<utility>
 #include<functional>
+#include<locale>
 #include "fileref.h"
 #include "tag.h"
 #include "MusicData.h"
 #include "PlayTime.h"
 #include "irrKlang.h"
-#pragma execution_character_set( "utf-8" )
 
 namespace fs = std::filesystem;
 using namespace Bubblegum;
