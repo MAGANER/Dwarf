@@ -78,7 +78,7 @@ void CommonMenu::run_common_list(const wsvector& data,
 	if(input == ENTER) choosen_option = current_elem;
 	
 	draw();
-	Sleep(40);
+	Sleep(20);
 }
 void CommonMenu::run_common_choosing_list(const wsvector& text,
 										  int& min,

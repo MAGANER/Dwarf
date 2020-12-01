@@ -309,7 +309,7 @@ void App::run_base_menu_list()
 		{
 			system("cls");
 			if(current == Groups) run_list_groups();
-			if(current == Genres) run_list_genres();
+			if(current == Genres) run_list_genres(music);
 			if(current == Artists)run_list_artists(music,L"");
 			if(current == Albums) run_list_albums(music,L"",L"");
 			break;
@@ -364,60 +364,6 @@ void App::run_list_groups()
 		elem_pos.Y = 1;
 	}
 }
-void App::run_list_genres()
-{
-	wsvector genres = get_genre_data_from_music();
-	sort(genres.begin(),genres.end());
-
-	int choosen_option = -1;
-		
-	int current_elem = 0;
-	int start_counter = 0;
-	int max_counter   = genres.size()< visible_range?genres.size():visible_range;
-	
-	while(true)
-	{
-		run_common_list(genres,
-						choosen_option,
-						"there is no any genre data",
-						current_elem,
-						start_counter,
-						max_counter,
-						"Genres:");
-		if(choosen_option == -2) break;
-		if(choosen_option == current_elem)
-		{
-			system("cls");
-			choose_what_to_run_from_genre_menu(genres[choosen_option]);
-			choosen_option = -1;
-		}
-	}
-	system("cls");
-}
-void App::choose_what_to_run_from_genre_menu(const wstring& genre_name)
-{
-	wsvector text = 
-	{
-		L"What you want to see from "+genre_name+L":",
-		L"Artists",
-		L"Albums",
-		L"Compositions",
-	};
-	int choosen_option = -1;
-	
-	int min = 1;
-	int max = 3;
-	int current = 1;
-	while(true)
-	{
-		run_common_choosing_list(text,min,max,current,choosen_option);
-		if(choosen_option == 1) run_list_artists(music,genre_name);
-		if(choosen_option == 2) run_list_albums(music,genre_name,L"");
-		if(choosen_option == 3) run_list_titles(music,genre_name,L"",L"");
-		if(choosen_option == -2) break;
-	}
-	system("cls");
-}
 wstring App::fix_path_slash(const wstring& path)
 {
 	//change \ to /
@@ -443,17 +389,6 @@ wstring App::get_path_to_title(const wstring& artist,
 	}
 	return path;
 }							   
-wsvector App::get_genre_data_from_music()
-{
-	wsvector data;
-	for(auto& m:music)
-	{
-		bool already_added = find(data.begin(),data.end(),m->genre) != data.end();
-		if(!already_added) data.push_back(m->genre);
-	}
-	data.erase(--data.end());
-	return data;
-}
 wstring App::clear_string(const wstring& str)
 {
 	wstring cleared;
