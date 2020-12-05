@@ -1,10 +1,10 @@
 #ifndef ALBUM_MENU_H
 #define ALBUM_MENU_H
-#include"Player.h"
+#include"PlayerMenu.h"
 
 namespace Dwarf
 {
-class AlbumMenu : public virtual Player
+class AlbumMenu : public virtual PlayerMenu
 {
 public:
 	AlbumMenu();
