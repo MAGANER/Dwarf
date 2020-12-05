@@ -1,31 +1,35 @@
-#ifndef PLAYER_H
-#define PLAYER_H
+#ifndef PlayerMenu_H
+#define PlayerMenu_H
 #include"CommonMenu.h"
 #include "MusicData.h"
 #include "PlayTime.h"
-#include "irrKlang.h"
+#include "windows.h"
+#include<cstring> 
+#include "audiere.h"
+#include <cmath>
 
-using namespace irrklang;
+using namespace audiere; 
 namespace Dwarf
 {
 	
 typedef pair<wstring,wstring> wspair;
 typedef vector<wspair> wspvector;	
 
-class Player : public virtual CommonMenu
+class PlayerMenu : public virtual CommonMenu
 {
 protected:
-	ISoundEngine* engine;
 	svector loaded_music;
 	
 	bool play_next = false;
 	
 	wspvector current_play_list;
 	int current_play_list_pos;
-	irrklang::ik_f32 volume_cash;
+	float volume= 1.0f;
+	int volume_percent = 100;	
+	
 public:
-	Player();
-	virtual ~Player();
+	PlayerMenu();
+	virtual ~PlayerMenu();
 	
 	void run_list_titles(const vector<MusicData*>& data,
 						 const wstring& genre,
@@ -45,7 +49,8 @@ private:
 							   const wstring& artist, 
 							   const wstring& album,
 							   const wstring& title);
-	PlayTime* compute_time(irrklang::ik_u32 time);
+	PlayTime* compute_time(unsigned int time);
 };
 };
-#endif //PLAYER_H
+
+#endif //PlayerMenu_H

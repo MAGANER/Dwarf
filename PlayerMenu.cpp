@@ -1,27 +1,25 @@
-#include"Player.h"
+#include"PlayerMenu.h"
 using namespace Dwarf;
 
-Player::Player()
+PlayerMenu::PlayerMenu()
 {
-	volume_cash = 1.0f;
 }
-Player::~Player()
+PlayerMenu::~PlayerMenu()
 {
-	
 }
-void Player::run_playing_composition(const vector<MusicData*>& _music,
+
+void PlayerMenu::run_playing_composition(const vector<MusicData*>& _music,
 									 bool& play_next,
 								     const wstring& artist,
 								     const wstring& album,
 								     const wspair& title)
 {	
-	engine = createIrrKlangDevice();
-	engine->setSoundVolume(volume_cash);
+	AudioDevicePtr device  = OpenDevice();
 	system("cls");
 
 	wstring _genre = get_genre_of_title(_music,artist,album,title.first);
 	wstring _path = title.second;
-	string  path  = convert_wstring_to_std(_path); 
+	string path  = convert_wstring_to_std(_path); 
 	
 	wstring label = L"Playing:";
 	COORD label_pos = {2,0};
@@ -36,18 +34,15 @@ void Player::run_playing_composition(const vector<MusicData*>& _music,
 	COORD next_pos   ={4,10};
 	
 	COORD play_next_pos = {4,12};
-	COORD repeat_pos    ={4,13};
-	COORD pause_pos     ={4,14};
+	COORD repeat_pos    = {4,13};
+	COORD pause_pos     = {4,14};
 
 	COORD help1 = {5,18};
 	COORD help2 = {5,19};
 	COORD help3 = {5,20};
 	COORD help4 = {5,21};
 	
-	
-	ISoundSource* music = nullptr;
-	unsigned int hours, mins, secs;
-	
+		
 	bool repeat = false;
 	bool play_next_after_finishing = true;
 	bool play = false;
@@ -56,10 +51,21 @@ void Player::run_playing_composition(const vector<MusicData*>& _music,
 	bool n_isnt_pressed     = true;
 	bool r_isnt_pressed      = true;
 	
+	int minutes,seconds, hours;
+	
+	OutputStreamPtr sound = OpenSound(device , path.c_str() , true);
+	sound->setVolume(volume);
+	
 	while(true)
 	{
-		int volume_output = engine->getSoundVolume()*100.0f;
-		string volume_str = "volume:"+to_string(volume_output)+"%% ";
+		
+		string vol_val = to_string(volume_percent);
+	
+		if(volume_percent < 100) vol_val = get_substr(vol_val,0,2);
+		if(volume_percent < 10)  vol_val = get_substr(vol_val,0,1);
+		vol_val+="%% ";	
+		
+		string volume_str = "volume:"+vol_val;
 
 		draw_string(label,red_label,label_pos);
 		
@@ -97,39 +103,18 @@ void Player::run_playing_composition(const vector<MusicData*>& _music,
 		
 		if(!play)
 		{
-			bool is_loaded_already = find(loaded_music.begin(),loaded_music.end(),path) != loaded_music.end();
-			if(!is_loaded_already)
-			{
-				music = engine->addSoundSourceFromFile(path.c_str());
-				loaded_music.push_back(path);
-			}
-			else
-			{
-				music = engine->getSoundSource(path.c_str());
-			}
-			irrklang::ik_u32 mlseconds= engine->getSoundSource(path.c_str())->getPlayLength();
-			
-			PlayTime* play_time = compute_time(mlseconds);
-			hours = play_time->hour;
-			mins  = play_time->minutes;
-			secs  = play_time->secs;
-			delete play_time;
-			
-			engine->play2D(music);
+			sound->play();
 			play = true;
 		}
-		string _text = "length = "+to_string(hours)+":"+to_string(mins)+":"+to_string(secs);
-		draw_string(_text,standart,length_pos);
 
 
-		bool nothing_to_play = !engine->isCurrentlyPlaying(music); 
-		if(nothing_to_play && repeat) engine->play2D(music);
-		if(nothing_to_play && !repeat && play_next_after_finishing && can_play_next)
+		if(!sound->isPlaying() && repeat) sound->reset();
+		if(!sound->isPlaying() && !repeat && play_next_after_finishing && can_play_next && !pause)
 		{
 			play_next = true;
 			break;
 		}
-		if(nothing_to_play && !can_play_next) break;
+		if(!sound->isPlaying() && !repeat && !can_play_next && !pause) break;
 		
 		if(kbhit())
 		{
@@ -137,51 +122,55 @@ void Player::run_playing_composition(const vector<MusicData*>& _music,
 		
 			if(input == ESCAPE) 
 			{
-				engine->stopAllSounds();
-				engine->drop();
 				play_next = false;
 				break;
 			}
 		
-			float val = engine->getSoundVolume();
-			if(input == PLUS)
+			if(input == PLUS && volume_percent < 100)
 			{
-				if(val < 1.0f)
-				{					
-					engine->setSoundVolume(val+0.01f);
-					volume_cash = engine->getSoundVolume();
-				}
+				volume+=0.01f;
+				volume_percent++;
+				sound->setVolume(volume);
 			}
 			if(input == MINUS)
 			{
-				if(val > 0.0f) 
+				if(volume > 0.000001f)
 				{
-					engine->setSoundVolume(val-0.01f);
-					volume_cash = engine->getSoundVolume();
+					volume-=0.01f;
+					volume_percent--;
+					sound->setVolume(volume);
+				}
+				if(volume < 0.000002f)
+				{
+					volume = 0.0f;
+					volume_percent = 0;
+					sound->setVolume(volume);
 				}
 			}
 			
 		
 			if(input == SPACE && !pause && space_isnt_pressed) 
 			{
-				engine->setAllSoundsPaused(true); 
+				sound->stop();
 				pause = true;
 				space_isnt_pressed = false;
 			}
 			if(input == SPACE &&  pause && space_isnt_pressed) 
 			{
-				engine->setAllSoundsPaused(false);
+				sound->play();
 				pause = false;
 				space_isnt_pressed = false;
 			}
 		
 			if(input == R && !repeat && r_isnt_pressed)
 			{
+				sound->setRepeat(true);
 				repeat = true;
 				r_isnt_pressed = false;
 			}
 			if(input == R && repeat && r_isnt_pressed)
 			{
+				sound->setRepeat(false);
 				repeat = false;
 				r_isnt_pressed = false;
 			}
@@ -203,12 +192,11 @@ void Player::run_playing_composition(const vector<MusicData*>& _music,
 		}
 		
 		Sleep(10);
-		engine->update();
 	}
 	
 	system("cls");
 }
-void Player::run_list_titles(const vector<MusicData*>& data,
+void PlayerMenu::run_list_titles(const vector<MusicData*>& data,
 							 const wstring& genre,
 							 const wstring& artist, 
 							 const wstring& album)
@@ -262,41 +250,61 @@ void Player::run_list_titles(const vector<MusicData*>& data,
 	}
 	system("cls");
 }
-wspvector Player::get_title_data_from_music(const vector<MusicData*>& music,
+wspvector PlayerMenu::get_title_data_from_music(const vector<MusicData*>& music,
 											const wstring& artist, 
 											const wstring& genre)
 {
 	wspvector data;
+	wsvector added;
 	for(auto& m:music)
 	{
-		wspair _new(m->title,m->path);
-		bool is_new = find(data.begin(),data.end(),_new) == data.end();
+		bool is_new = find(added.begin(),added.end(),m->title) == added.end();
 		if(is_new)
 		{
 			
-			if(artist.empty()      && genre.empty())       data.push_back(wspair(m->title,m->path));
-			if(genre == m->genre   && artist.empty())      data.push_back(wspair(m->title,m->path));
-			if(genre.empty()       && artist== m->artist)  data.push_back(wspair(m->title,m->path));
-			if(genre == m->genre   && artist == m->artist) data.push_back(wspair(m->title,m->path));
+			if(artist.empty()      && genre.empty())
+			{
+				data.push_back(wspair(m->title,m->path));
+				added.push_back(m->title);
+			}
+			if(genre == m->genre   && artist.empty())     
+			{
+				data.push_back(wspair(m->title,m->path));
+				added.push_back(m->title);
+			}
+			if(genre.empty()       && artist== m->artist) 
+			{
+				data.push_back(wspair(m->title,m->path));
+				added.push_back(m->title);
+			}
+			if(genre == m->genre   && artist == m->artist)
+			{
+				data.push_back(wspair(m->title,m->path));
+				added.push_back(m->title);
+			}
 		}
 	}
 	return data;
 }
-wspvector Player::get_title_data_from_music(const vector<MusicData*>& music,const wstring& album)
+wspvector PlayerMenu::get_title_data_from_music(const vector<MusicData*>& music,const wstring& album)
 {
 	wspvector data;
+	wsvector added;
 	for(auto& m:music)
 	{
-		wspair _new(m->title,m->path);
-		bool is_new = find(data.begin(),data.end(),_new) == data.end();
+		bool is_new = find(added.begin(),added.end(),m->title) == added.end();
 		if(is_new)
 		{
-			if(album  == m->album) data.push_back(wspair(m->title,m->path));
+			if(album  == m->album)
+			{
+				data.push_back(wspair(m->title,m->path));
+				added.push_back(m->title);
+			}
 		}
 	}
 	return data;	
 }
-wstring Player::get_genre_of_title(const vector<MusicData*>& music,
+wstring PlayerMenu::get_genre_of_title(const vector<MusicData*>& music,
 								   const wstring& artist, 
 								   const wstring& album,
 							       const wstring& title)
@@ -311,7 +319,7 @@ wstring Player::get_genre_of_title(const vector<MusicData*>& music,
 	if(str.empty()) str = L"None";
 	return str;
 }	
-PlayTime* Player::compute_time(irrklang::ik_u32 time)
+PlayTime* PlayerMenu::compute_time(unsigned int time)
 {
 	if(time == 0) return nullptr;
 	
