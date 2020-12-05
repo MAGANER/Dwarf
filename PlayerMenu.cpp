@@ -9,14 +9,18 @@ PlayerMenu::~PlayerMenu()
 }
 
 void PlayerMenu::run_playing_composition(const vector<MusicData*>& _music,
-									 bool& play_next,
-								     const wstring& artist,
-								     const wstring& album,
-								     const wspair& title)
+										 const wstring& artist,
+								         const wstring& album,
+								         const wspair& title)
 {	
 	clear();
 	AudioDevicePtr device  = OpenDevice();
-
+	if(!device)
+	{
+		cout<<"something went wrong with output device...";
+		exit(0);
+	}
+	
 	wstring _genre = get_genre_of_title(_music,artist,album,title.first);
 	wstring _path = title.second;
 	string path  = convert_wstring_to_std(_path); 
@@ -54,16 +58,22 @@ void PlayerMenu::run_playing_composition(const vector<MusicData*>& _music,
 	bool space_isnt_pressed = true;
 	bool n_isnt_pressed     = true;
 	bool r_isnt_pressed      = true;
+	bool stop = false;
 	
 	//time
 	int minutes,seconds, hours;
 	
 	OutputStreamPtr sound = OpenSound(device , path.c_str() , true);
-	sound->setVolume(volume);
-	
-	while(true)
+	if(!sound)
 	{
-		
+		cout<<"something went wrong...";
+		exit(-1);
+	}
+	
+	
+	while(!stop)
+	{
+		sound->setVolume(volume);
 		string vol_val = to_string(volume_percent);
 	
 		if(volume_percent < 100) vol_val = get_substr(vol_val,0,2);
@@ -114,12 +124,12 @@ void PlayerMenu::run_playing_composition(const vector<MusicData*>& _music,
 		}
 
 
-		if(!sound->isPlaying() && !repeat && !can_play_next && !pause) break;
+		if(!sound->isPlaying() && !repeat && !can_play_next && !pause) stop = true;
 		if(!sound->isPlaying() && repeat) sound->reset();
 		if(!sound->isPlaying() && !repeat && play_next_after_finishing && can_play_next && !pause)
 		{
 			play_next = true;
-			break;
+			stop = true;
 		}
 		
 		if(kbhit())
@@ -228,7 +238,7 @@ void PlayerMenu::run_list_titles(const vector<MusicData*>& data,
 	auto play = [&]()
 	{
 		clear();
-		run_playing_composition(data,play_next,artist,album,titles[current_elem]);
+		run_playing_composition(data,artist,album,titles[current_elem]);
 	};
 	
 	while(true)

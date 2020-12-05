@@ -44,7 +44,6 @@ public:
 						 const wstring& artist, 
 						 const wstring& album);
 	void run_playing_composition(const vector<MusicData*>& _music,
-								 bool& play_next,
 								 const wstring& artist, 
 								 const wstring& album,
 								 const wspair& title);
