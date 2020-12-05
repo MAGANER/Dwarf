@@ -10,11 +10,13 @@ App::App()
 	able_extensions = {L"mp3"};
 	
 	load_config();
+	
 	smart_sort   = is_smart_sort_enabled();
 	searching_paths = get_searching_paths();
-	get_music_files();
 	size = get_terminal_size();
 	max_path_char_number = get_max_path_char_number();
+	
+	get_music_files();
 	set_terminal_size();
 	clear();
 	
@@ -37,6 +39,8 @@ void App::run()
 }
 void App::draw_label()
 {
+	//draw label of main menu
+	
 	COORD pos;
 	pos.X = 28;
 	pos.Y = 0;
@@ -44,6 +48,8 @@ void App::draw_label()
 }
 void App::draw_help()
 {
+	//draw list of able functions at main menu
+	
 	COORD pos;
 	pos.X = 20;
 	pos.Y = 5;
@@ -69,6 +75,7 @@ void App::run_main_menu()
 	draw_label();
 	draw_help();
 }
+
 void App::run_add_menu()
 {
 	COORD pos;
@@ -364,63 +371,4 @@ wstring App::fix_path_slash(const wstring& path)
 		else new_+=L"/";
 	}
 	return new_;
-}
-wstring App::get_path_to_title(const wstring& artist, 
-							   const wstring& album,
-							   const wstring& title)
-{
-	wstring path;
-	for(auto& m:music)
-	{
-		if(m->artist == artist &&
-		   m->album  == album  &&
-		   m->title  == title) path = m->path;
-	}
-	return path;
-}							   
-wstring App::clear_string(const wstring& str)
-{
-	wstring cleared;
-	for(auto& ch: str)
-	{
-		if(!isspace(ch))
-			cleared.push_back(tolower(ch));
-	}
-	return cleared;
-}
-
-template<typename T>
-typename T::size_type App::LevenshteinDistance(const T &source,
-											   const T &target)
-{
-    if (source.size() > target.size()) {
-        return LevenshteinDistance(target, source);
-    }
-
-    using TSizeType = typename T::size_type;
-    const TSizeType min_size = source.size(), max_size = target.size();
-    std::vector<TSizeType> lev_dist(min_size + 1);
-
-    for (TSizeType i = 0; i <= min_size; ++i) {
-        lev_dist[i] = i;
-    }
-
-    for (TSizeType j = 1; j <= max_size; ++j) {
-        TSizeType previous_diagonal = lev_dist[0], previous_diagonal_save;
-        ++lev_dist[0];
-
-        for (TSizeType i = 1; i <= min_size; ++i) {
-            previous_diagonal_save = lev_dist[i];
-            if (source[i - 1] == target[j - 1]) {
-                lev_dist[i] = previous_diagonal;
-            } else {
-                lev_dist[i] = std::min(std::min(lev_dist[i - 1], lev_dist[i]), previous_diagonal) + 1;
-            }
-            previous_diagonal = previous_diagonal_save;
-        }
-    }
-
-    return lev_dist[min_size];
-}
-												   
-												   
+}				   

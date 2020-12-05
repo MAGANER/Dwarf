@@ -1,7 +1,9 @@
+/*
+	Entry point for console edition of application.
+*/
 #ifndef APP_H
 #define APP_H
 
-#include<filesystem>
 #include<vector>
 #include<fstream>
 
@@ -11,11 +13,8 @@
 #include "fileref.h"
 #include "tag.h"
 
-
-namespace fs = std::filesystem;
 using namespace Bubblegum;
 using namespace _VirtualMachine;
-using namespace irrklang;
 
 namespace Dwarf
 {	
@@ -106,25 +105,11 @@ private:
 	void run_base_menu_list();
 	void run_list_groups();
 	//.
-	
-	//
-	wstring get_path_to_title(const wstring& artist, 
-							   const wstring& album,
-							   const wstring& title);
-	//.
-	
+		
 	//common stuff
 	void run_mode();
 	void set_mode(int input_code);
-	wstring clear_string(const wstring& str);
 	//.
-	
-	
-	//took it from https://ru.wikibooks.org/wiki/Реализации_алгоритмов/Расстояние_Левенштейна#C++
-	template<typename T>
-	typename T::size_type LevenshteinDistance(const T &source,
-											  const T &target);
-	
 };
 };
 #endif //APP_H

@@ -1,17 +1,26 @@
+/*
+	Class provides abilities to play music.
+	Also it renderes the menu.
+*/
+
 #ifndef PlayerMenu_H
 #define PlayerMenu_H
+
 #include"CommonMenu.h"
 #include "MusicData.h"
 #include "PlayTime.h"
-#include "windows.h"
-#include<cstring> 
-#include "audiere.h"
-#include <cmath>
 
+#include<cstring> 
+#include<filesystem>
+#include <cmath>
+#include <windows.h>
+
+#include "audiere.h"
+
+namespace fs = std::filesystem;
 using namespace audiere; 
 namespace Dwarf
-{
-	
+{	
 typedef pair<wstring,wstring> wspair;
 typedef vector<wspair> wspvector;	
 
@@ -24,9 +33,8 @@ protected:
 	
 	wspvector current_play_list;
 	int current_play_list_pos;
-	float volume= 1.0f;
+	float volume       = 1.0f;
 	int volume_percent = 100;	
-	
 public:
 	PlayerMenu();
 	virtual ~PlayerMenu();
@@ -49,7 +57,7 @@ private:
 							   const wstring& artist, 
 							   const wstring& album,
 							   const wstring& title);
-	PlayTime* compute_time(unsigned int time);
+	PlayTime* compute_time(const string& path_to_file);
 };
 };
 

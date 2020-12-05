@@ -14,24 +14,26 @@ void PlayerMenu::run_playing_composition(const vector<MusicData*>& _music,
 								     const wstring& album,
 								     const wspair& title)
 {	
+	clear();
 	AudioDevicePtr device  = OpenDevice();
-	system("cls");
 
 	wstring _genre = get_genre_of_title(_music,artist,album,title.first);
 	wstring _path = title.second;
 	string path  = convert_wstring_to_std(_path); 
 	
+	
+	//label positions
 	wstring label = L"Playing:";
 	COORD label_pos = {2,0};
 	
-	COORD title_pos  ={4,2};
-	COORD artist_pos ={4,3};
-	COORD album_pos  ={4,4};
-	COORD genre_pos  ={4,5};
-	COORD volume_pos ={4,7};
-	COORD length_pos ={4,8};
+	COORD title_pos   ={4,2};
+	COORD artist_pos  ={4,3};
+	COORD album_pos   ={4,4};
+	COORD genre_pos   ={4,5};
+	COORD volume_pos  ={4,7};
+	COORD length_pos  ={4,8};
 	COORD curr_pos_pos={4,9};
-	COORD next_pos   ={4,10};
+	COORD next_pos    ={4,10};
 	
 	COORD play_next_pos = {4,12};
 	COORD repeat_pos    = {4,13};
@@ -41,8 +43,10 @@ void PlayerMenu::run_playing_composition(const vector<MusicData*>& _music,
 	COORD help2 = {5,19};
 	COORD help3 = {5,20};
 	COORD help4 = {5,21};
+	//
 	
-		
+	
+	//logical variables
 	bool repeat = false;
 	bool play_next_after_finishing = true;
 	bool play = false;
@@ -51,6 +55,7 @@ void PlayerMenu::run_playing_composition(const vector<MusicData*>& _music,
 	bool n_isnt_pressed     = true;
 	bool r_isnt_pressed      = true;
 	
+	//time
 	int minutes,seconds, hours;
 	
 	OutputStreamPtr sound = OpenSound(device , path.c_str() , true);
@@ -103,18 +108,19 @@ void PlayerMenu::run_playing_composition(const vector<MusicData*>& _music,
 		
 		if(!play)
 		{
+			sound->reset();
 			sound->play();
 			play = true;
 		}
 
 
+		if(!sound->isPlaying() && !repeat && !can_play_next && !pause) break;
 		if(!sound->isPlaying() && repeat) sound->reset();
 		if(!sound->isPlaying() && !repeat && play_next_after_finishing && can_play_next && !pause)
 		{
 			play_next = true;
 			break;
 		}
-		if(!sound->isPlaying() && !repeat && !can_play_next && !pause) break;
 		
 		if(kbhit())
 		{
@@ -125,7 +131,8 @@ void PlayerMenu::run_playing_composition(const vector<MusicData*>& _music,
 				play_next = false;
 				break;
 			}
-		
+			
+			//change volume
 			if(input == PLUS && volume_percent < 100)
 			{
 				volume+=0.01f;
@@ -148,7 +155,7 @@ void PlayerMenu::run_playing_composition(const vector<MusicData*>& _music,
 				}
 			}
 			
-		
+			//pause 
 			if(input == SPACE && !pause && space_isnt_pressed) 
 			{
 				sound->stop();
@@ -161,7 +168,8 @@ void PlayerMenu::run_playing_composition(const vector<MusicData*>& _music,
 				pause = false;
 				space_isnt_pressed = false;
 			}
-		
+			
+			//repeat
 			if(input == R && !repeat && r_isnt_pressed)
 			{
 				sound->setRepeat(true);
@@ -175,6 +183,7 @@ void PlayerMenu::run_playing_composition(const vector<MusicData*>& _music,
 				r_isnt_pressed = false;
 			}
 		
+			//play next song
 			if(input == N && !play_next_after_finishing && n_isnt_pressed)
 			{
 				play_next_after_finishing = true;
@@ -194,7 +203,7 @@ void PlayerMenu::run_playing_composition(const vector<MusicData*>& _music,
 		Sleep(10);
 	}
 	
-	system("cls");
+	clear();
 }
 void PlayerMenu::run_list_titles(const vector<MusicData*>& data,
 							 const wstring& genre,
@@ -218,7 +227,7 @@ void PlayerMenu::run_list_titles(const vector<MusicData*>& data,
 	
 	auto play = [&]()
 	{
-		system("cls");
+		clear();
 		run_playing_composition(data,play_next,artist,album,titles[current_elem]);
 	};
 	
@@ -248,7 +257,7 @@ void PlayerMenu::run_list_titles(const vector<MusicData*>& data,
 			choosen_option = -1;
 		}
 	}
-	system("cls");
+	clear();
 }
 wspvector PlayerMenu::get_title_data_from_music(const vector<MusicData*>& music,
 											const wstring& artist, 
@@ -319,27 +328,10 @@ wstring PlayerMenu::get_genre_of_title(const vector<MusicData*>& music,
 	if(str.empty()) str = L"None";
 	return str;
 }	
-PlayTime* PlayerMenu::compute_time(unsigned int time)
+PlayTime* PlayerMenu::compute_time(const string& path_to_file)
 {
-	if(time == 0) return nullptr;
+	fs::path _path(path_to_file);
+	int size = fs::file_size(_path);
 	
-	int second = 1000; // 1 sec = 1000 miliseconds
-	int minute = 60;   // 1 min = 60 seconds
-	int hour   = 60;   // 1 hour= 60 minute
-	
-	double total_seconds = (double)time/second;
-	double total_minutes = total_seconds/60;
-	double total_hours   = total_minutes/60;
-	
-	
-	unsigned int secs  = total_seconds  > 1.0f? (int)total_seconds%60 : 0;
-	unsigned int mins  = total_minutes  > 1.0f? (int)total_minutes : 0;
-	unsigned int hours = 0;
-	if(total_hours > 1.0f)
-	{
-		hours = (int) total_hours;
-		mins  = (int) modf(total_hours,NULL); 
-	}
-	
-	return new PlayTime(hours,mins,secs);	
+	return new PlayTime(0,0,0);	
 }
