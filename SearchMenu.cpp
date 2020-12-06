@@ -10,15 +10,33 @@ void SearchMenu::run_search(const vector<MusicData*>& music)
 	draw_string("look for:",standart, pos);
 	wstring input = get_wpath();
 	
-	wspvector results = search(music,input);
+	vector<SearchResultData*> results = search(music,input);
 	wsvector  text_only;
-	for(auto& s:results)text_only.push_back(s.second);
+	for(auto& s:results)
+	{
+		if(s->type == SearchResultData::SearchDataType::Genre)
+		{
+			text_only.push_back(L"genre:"+s->data->genre);
+		}
+		if(s->type == SearchResultData::SearchDataType::Artist)
+		{
+			text_only.push_back(L"artist:"+s->data->artist);
+		}
+		if(s->type == SearchResultData::SearchDataType::Album)
+		{
+			text_only.push_back(L"album:"+s->data->album);
+		}
+		if(s->type == SearchResultData::SearchDataType::Title)
+		{
+			text_only.push_back(L"title:"+s->data->title);
+		}
+	}
 	
 	int choosen_option = -1;
 	int current_elem = 0;
 	int start_counter = 0;
 	int max_counter   = results.size()< visible_range? results.size():visible_range;
-	while(true)
+	while(true && !results.empty())
 	{
 		run_common_list(text_only,
 						choosen_option,
@@ -28,22 +46,49 @@ void SearchMenu::run_search(const vector<MusicData*>& music)
 						max_counter,
 						"Found:");
 		
-		auto type = results[current_elem].first;
+		auto curr = results[current_elem];
+		auto type = curr->type;
 		bool list_item = choosen_option == current_elem;
+		
 		if(choosen_option == -2) break;
-		if(list_item && type == L"genre")
+		if(list_item && type == SearchResultData::SearchDataType::Genre)
 		{
 			clear();
-			choose_what_to_run_from_genre_menu(music,results[current_elem].second);
+			
+			choose_what_to_run_from_genre_menu(music,curr->data->genre);
+			choosen_option = -1;
+		}
+		if(list_item && type == SearchResultData::SearchDataType::Title)
+		{
+			clear();
+		
+			wspair data(curr->data->title,curr->data->path);
+			run_playing_composition(music,curr->data->artist,curr->data->album,data);
+			choosen_option = -1;
+		}
+		if(list_item && type == SearchResultData::SearchDataType::Album)
+		{
+			clear();
+			
+			run_list_titles(music,curr->data->genre,curr->data->artist,curr->data->album);
+			choosen_option = -1;
+		}
+		if(list_item && type == SearchResultData::SearchDataType::Artist)
+		{
+			clear();
+			
+			choose_what_to_run_from_artist_menu(music,curr->data->artist,curr->data->genre);
+			choosen_option = -1;
 		}
 	}
 
 	clear();
 }
-wspvector SearchMenu::search(const vector<MusicData*>& music,
-							 const wstring& source)
+vector<SearchResultData*> SearchMenu::search(const vector<MusicData*>& music,
+					     const wstring& source)
 {
-	wspvector results;
+	vector<SearchResultData*> results;
+	wspvector cash;
 	for(auto& file:music)
 	{
 		bool _artist = file->artist.find(source) != wstring::npos;
@@ -51,30 +96,64 @@ wspvector SearchMenu::search(const vector<MusicData*>& music,
 		bool _genre  = file->genre.find(source)  != wstring::npos;
 		bool _title  = file->title.find(source)  != wstring::npos;
 		
-		if(_artist)
+		string type;
+		if(_artist) type+="1";
+		if(_album)  type+="2";
+		if(_genre)  type+="3";
+		if(_title)  type+="4";
+		
+		int end = string::npos;
+		bool is_artist = type.find('1') != end;
+		bool is_album  = type.find('2') != end;
+		bool is_genre  = type.find('3') != end;
+		bool is_title  = type.find('4') != end;
+		
+		if(is_artist)
 		{
-			auto val = wspair(L"artist",file->artist);
-			bool not_added = find(results.begin(),results.end(),val) == results.end();
-			if(not_added)results.push_back(val);
+			SearchResultData* val = new SearchResultData(SearchResultData::SearchDataType::Artist,file);
+			wspair added(L"1",file->artist);
+			bool not_added = find(cash.begin(),cash.end(),added) == cash.end();
+			if(not_added)
+			{
+				cash.push_back(added);
+				results.push_back(val);
+			}
 		}
-		if(_album)
+		if(is_album)
 		{
-			auto val = wspair(L"album",file->album);
-			bool not_added = find(results.begin(),results.end(),val) == results.end();
-			if(not_added)results.push_back(val);
+			SearchResultData* val = new SearchResultData(SearchResultData::SearchDataType::Album,file);
+			wspair added(L"2",file->album);
+			bool not_added = find(cash.begin(),cash.end(),added) == cash.end();
+			if(not_added)
+			{
+				cash.push_back(added);
+				results.push_back(val);
+			}
 		}
-		if(_genre)
+		if(is_genre)
 		{
-			auto val = wspair(L"genre",file->genre);
-			bool not_added = find(results.begin(),results.end(),val) == results.end();
-			if(not_added)results.push_back(val);
+			SearchResultData* val = new SearchResultData(SearchResultData::SearchDataType::Genre,file);
+			wspair added(L"3",file->genre);
+			bool not_added = find(cash.begin(),cash.end(),added) == cash.end();
+			if(not_added)
+			{
+				cash.push_back(added);
+				results.push_back(val);
+			}
 		}
-		if(_title) 
+		
+		if(is_title)
 		{
-			auto val = wspair(L"title",file->title);
-			bool not_added = find(results.begin(),results.end(),val) == results.end();
-			if(not_added)results.push_back(val);
+			SearchResultData* val = new SearchResultData(SearchResultData::SearchDataType::Title,file);
+			wspair added(L"4",file->title);
+			bool not_added = find(cash.begin(),cash.end(),added) == cash.end();
+			if(not_added)
+			{
+				cash.push_back(added);
+				results.push_back(val);
+			}
 		}
+		
 	}
 	return results;		
 }
