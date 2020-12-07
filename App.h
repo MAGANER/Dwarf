@@ -9,24 +9,17 @@
 
 #include"ConfigLoader.h"
 #include"SearchMenu.h"
-
-#include "fileref.h"
-#include "tag.h"
+#include"PathManager.h"
 
 namespace Dwarf
 {	
 class App: public SearchMenu,
-		   public ConfigLoader
+		   public ConfigLoader,
+		   public PathManager
 {
-private:
-	svector searching_paths;
-	vector<MusicData*> music;
-	wsvector raw_music;
-	
+private:	
 	svector groups;
-	
-	wsvector able_extensions;
-			
+				
 	enum working_modes
 	{
 		MainMenu,
@@ -58,15 +51,7 @@ public:
 	App();
 	~App();
 	void run();
-private:	
-	//path stuff
-	svector get_searching_paths();
-	void get_music_files();
-	void apply_smart_sort();
-	bool is_extension_able(const wstring& extension);
-	wstring fix_path_slash(const wstring& path);
-	//.
-	
+private:		
 	//main menu stuff
 	void draw_label();
 	void draw_help();
@@ -76,7 +61,6 @@ private:
 	//adding menu stuff
 	void run_add_menu();
 	string get_path();
-	void add_new_search_paths(const string& value);
 	//.
 	
 	//listing menu stuff	
