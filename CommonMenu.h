@@ -2,16 +2,14 @@
 #define COMMON_MENU_H
 #include<functional>
 #include<cstdlib>
-#include<windows.h>
 #include<algorithm>
 #include<cwchar>
 #include"Console.h"
 #include"VirtualMachine/StrFunction.h"
 
-using namespace std;
 namespace Dwarf
 {
-typedef vector<wstring> wsvector;	
+typedef std::vector<wstring> wsvector;	
 
 class CommonMenu: public Console
 {

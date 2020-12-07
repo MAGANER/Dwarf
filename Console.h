@@ -11,7 +11,8 @@
 #include<string>
 #include<string.h>
 #include<iostream>
-using namespace std;
+#include"Pos.h"
+
 namespace Dwarf
 {
 struct Color
@@ -23,13 +24,6 @@ struct Color
 	void operator=(const Color& color);
 	bool operator==(const Color& color);
 	bool operator!=(const Color& color);
-};
-struct Pos
-{
-	int x,y;
-	Pos(int x,int y);
-	Pos();
-	~Pos();
 };
 class Console
 {
@@ -69,8 +63,8 @@ public:
 	Console();
 	virtual ~Console();
 	
-	void draw_string(const string& str, const Color& color, const COORD& pos);
-	void draw_string(const wstring& str, const Color& color, const COORD& pos);
+	void draw_string(const std::string& str, const Color& color, const COORD& pos);
+	void draw_string(const std::wstring& str, const Color& color, const COORD& pos);
 	void clear();
 };
 };

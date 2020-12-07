@@ -7,25 +7,18 @@
 #include<vector>
 #include<fstream>
 
+#include"ConfigLoader.h"
 #include"SearchMenu.h"
-#include"VirtualMachine/VirtualMachine.h"
 
 #include "fileref.h"
 #include "tag.h"
 
-using namespace Bubblegum;
-using namespace _VirtualMachine;
-
 namespace Dwarf
 {	
-class App: public SearchMenu
+class App: public SearchMenu,
+		   public ConfigLoader
 {
 private:
-	VirtualMachine machine;
-	
-	Pos size;
-	int max_path_char_number;
-	
 	svector searching_paths;
 	vector<MusicData*> music;
 	wsvector raw_music;
@@ -65,28 +58,13 @@ public:
 	App();
 	~App();
 	void run();
-private:
-
-	//config stuff
-	void load_config();
-	Pos get_terminal_size();
-	int get_max_path_char_number();
-	bool is_smart_sort_enabled();
-	
-	void set_terminal_size();
-	//.
-	
+private:	
 	//path stuff
 	svector get_searching_paths();
 	void get_music_files();
 	void apply_smart_sort();
 	bool is_extension_able(const wstring& extension);
 	wstring fix_path_slash(const wstring& path);
-	//.
-	
-	//error stuff 
-	void write_error_log_file(const string& error);
-	void process_error(const string& error);
 	//.
 	
 	//main menu stuff
