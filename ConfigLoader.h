@@ -3,6 +3,7 @@
 #include<windows.h>
 #include"VirtualMachine/VirtualMachine.h"
 #include"Pos.h"
+#include"ErrorProcessor.h"
 
 namespace bg = Bubblegum::_VirtualMachine;
 namespace Dwarf
@@ -23,9 +24,6 @@ public:
 	int get_max_path_char_number();
 	bool is_smart_sort_enabled();
 	void set_terminal_size();
-	
-	void write_error_log_file(const std::string& error);
-	void process_error(const std::string& error);
 };
 };
 #endif //CONFIG_LOADER_H

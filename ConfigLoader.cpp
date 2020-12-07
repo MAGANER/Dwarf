@@ -38,15 +38,3 @@ void ConfigLoader::set_terminal_size()
 	HWND hwnd = FindWindow(NULL,"Dwarf");
 	MoveWindow(hwnd,100,100,size.x,size.y,false);
 }
-void ConfigLoader::process_error(const std::string& error)
-{
-	std::cout<<error<<endl;
-	write_error_log_file(error);
-	exit(0);
-}
-void ConfigLoader::write_error_log_file(const std::string& error)
-{
-	std::ofstream error_log("error.txt");
-	error_log<<error;
-	error_log.close();
-}
