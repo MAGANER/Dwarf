@@ -52,6 +52,8 @@ void PathManager::get_music_files()
 {
 	for(auto& spath: searching_paths)
 	{
+		if(fs::exists(spath))
+		{
 		for(auto& data: fs::recursive_directory_iterator(spath))
 		{
 			std::wstring str = fix_path_slash(data.path().wstring());
@@ -84,6 +86,7 @@ void PathManager::get_music_files()
 					}
 				}
 			}
+		}
 		}
 	}
 }
