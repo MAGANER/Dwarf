@@ -4,6 +4,7 @@ using namespace Dwarf;
 App::App()
 {	
 	SetConsoleOutputCP(1251);
+	SetConsoleCP(1251);
 	system("title Dwarf");
 	clear();
 	
