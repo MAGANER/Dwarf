@@ -3,9 +3,25 @@ using namespace Dwarf;
 
 PlayerMenu::PlayerMenu()
 {
+	player = CreateZPlay();
+	if(player == 0)
+	{
+		audio_init = false;
+		cout<<"can not create audio player object!"<<endl;
+		getch();
+	}
+	
+	int version = player->GetVersion();
+	if(version < 190)
+	{
+		audio_init = false;
+		cout<<"need libZplay 1.9 or above!"<<endl;
+		getch();
+	}
 }
 PlayerMenu::~PlayerMenu()
 {
+	player->Release();
 }
 
 void PlayerMenu::run_playing_composition(const vector<MusicData*>& _music,
@@ -14,13 +30,7 @@ void PlayerMenu::run_playing_composition(const vector<MusicData*>& _music,
 								         const wspair& title)
 {	
 	clear();
-	AudioDevicePtr device  = OpenDevice();
-	if(!device)
-	{
-		cout<<"something went wrong with output device...";
-		exit(0);
-	}
-	
+
 	wstring _genre = get_genre_of_title(_music,artist,album,title.first);
 	wstring _path = title.second;
 	string path  = convert_wstring_to_std(_path); 
@@ -60,26 +70,26 @@ void PlayerMenu::run_playing_composition(const vector<MusicData*>& _music,
 	bool r_isnt_pressed      = true;
 	bool stop = false;
 	
+	
 	//time
-	int minutes,seconds, hours;
+	int hr, min, sec;
 	
-	OutputStreamPtr sound = OpenSound(device , path.c_str() , true);
-	if(!sound)
+	TStreamInfo info;
+	TStreamStatus status;
+	
+	if(!audio_init)
 	{
-		cout<<"something went wrong...";
-		exit(-1);
+		cout<<"It is not unable to play music!"<<endl;
+		system("pause");
 	}
-	
-	
-	while(!stop)
+	while(!stop && audio_init)
 	{
-		sound->setVolume(volume);
-		string vol_val = to_string(volume_percent);
-	
-		if(volume_percent < 100) vol_val = get_substr(vol_val,0,2);
-		if(volume_percent < 10)  vol_val = get_substr(vol_val,0,1);
-		vol_val+="%% ";	
+		player->SetMasterVolume(volume,volume);
 		
+		string vol_val = to_string(volume);	
+		if(volume < 100) vol_val = get_substr(vol_val,0,2);
+		if(volume < 10)   vol_val= get_substr(vol_val,0,1);
+		vol_val+="%% ";
 		string volume_str = "volume:"+vol_val;
 
 		draw_string(label,red_label,label_pos);
@@ -118,19 +128,45 @@ void PlayerMenu::run_playing_composition(const vector<MusicData*>& _music,
 		
 		if(!play)
 		{
-			sound->reset();
-			sound->play();
+			if(player->OpenFile(path.c_str(),sfAutodetect) == 0)
+			{
+				cout<<"can not open "+path<<endl;
+				getch();
+				break;
+			}
+					
+			if(player->Play() == 0)
+			{
+				cout<<"can not play "+path+"!"<<endl;
+				getch();
+				break;
+			}
+			player->GetStreamInfo(&info);
+			
+			PlayTime* time = compute_time(info.Length.ms);
+			hr = time->hour;
+			min= time->minutes;
+			sec= time->secs;
+			delete time;
+			
 			play = true;
 		}
-
-
-		if(!sound->isPlaying() && !repeat && !can_play_next && !pause) stop = true;
-		if(!sound->isPlaying() && repeat) sound->reset();
-		if(!sound->isPlaying() && !repeat && play_next_after_finishing && can_play_next && !pause)
+		
+		string length="length="+to_string(hr)+":"+to_string(min)+":"+to_string(sec);
+		draw_string(length,standart,length_pos);
+		
+		
+		player->GetStatus(&status);
+		bool not_playing = status.fPlay == 0 && !pause;
+		
+		if(not_playing && !repeat && !can_play_next) stop = true;
+		if(not_playing && repeat) player->Play();
+		if(not_playing && !repeat && play_next_after_finishing && can_play_next)
 		{
 			play_next = true;
 			stop = true;
 		}
+
 		
 		if(kbhit())
 		{
@@ -138,43 +174,33 @@ void PlayerMenu::run_playing_composition(const vector<MusicData*>& _music,
 		
 			if(input == ESCAPE) 
 			{
+				player->Close();
 				play_next = false;
 				break;
 			}
 			
 			//change volume
-			if(input == PLUS && volume_percent < 100)
+			if(input == PLUS && volume < 100)
 			{
-				volume+=0.01f;
-				volume_percent++;
-				sound->setVolume(volume);
+				++volume;
+				player->SetMasterVolume(volume,volume);
 			}
-			if(input == MINUS)
+			if(input == MINUS && volume > 0)
 			{
-				if(volume > 0.000001f)
-				{
-					volume-=0.01f;
-					volume_percent--;
-					sound->setVolume(volume);
-				}
-				if(volume < 0.000002f)
-				{
-					volume = 0.0f;
-					volume_percent = 0;
-					sound->setVolume(volume);
-				}
+				--volume;
+				player->SetMasterVolume(volume,volume);
 			}
 			
 			//pause 
 			if(input == SPACE && !pause && space_isnt_pressed) 
 			{
-				sound->stop();
+				player->Pause();
 				pause = true;
 				space_isnt_pressed = false;
 			}
 			if(input == SPACE &&  pause && space_isnt_pressed) 
 			{
-				sound->play();
+				player->Resume();
 				pause = false;
 				space_isnt_pressed = false;
 			}
@@ -182,13 +208,11 @@ void PlayerMenu::run_playing_composition(const vector<MusicData*>& _music,
 			//repeat
 			if(input == R && !repeat && r_isnt_pressed)
 			{
-				sound->setRepeat(true);
 				repeat = true;
 				r_isnt_pressed = false;
 			}
 			if(input == R && repeat && r_isnt_pressed)
 			{
-				sound->setRepeat(false);
 				repeat = false;
 				r_isnt_pressed = false;
 			}
@@ -338,10 +362,27 @@ wstring PlayerMenu::get_genre_of_title(const vector<MusicData*>& music,
 	if(str.empty()) str = L"None";
 	return str;
 }	
-PlayTime* PlayerMenu::compute_time(const string& path_to_file)
+PlayTime* PlayerMenu::compute_time(int time)
 {
-	fs::path _path(path_to_file);
-	int size = fs::file_size(_path);
+	if(time == 0) return nullptr;
 	
-	return new PlayTime(0,0,0);	
+	int second = 1000; // 1 sec = 1000 miliseconds
+	int minute = 60;   // 1 min = 60 seconds
+	int hour   = 60;   // 1 hour= 60 minute
+	
+	double total_seconds = (double)time/second;
+	double total_minutes = total_seconds/60;
+	double total_hours   = total_minutes/60;
+	
+	
+	unsigned int secs  = total_seconds  > 1.0f? (int)total_seconds%60 : 0;
+	unsigned int mins  = total_minutes  > 1.0f? (int)total_minutes : 0;
+	unsigned int hours = 0;
+	if(total_hours > 1.0f)
+	{
+		hours = (int) total_hours;
+		mins  = (int) modf(total_hours,NULL); 
+	}
+	
+	return new PlayTime(hours,mins,secs);	
 }

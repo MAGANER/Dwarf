@@ -12,13 +12,12 @@
 
 #include<cstring> 
 #include<filesystem>
-#include <cmath>
-#include <windows.h>
+#include<cmath>
 
-#include "audiere.h"
+#include"libzplay.h"
 
 namespace fs = std::filesystem;
-using namespace audiere; 
+using namespace libZPlay;
 namespace Dwarf
 {	
 typedef pair<wstring,wstring> wspair;
@@ -26,6 +25,9 @@ typedef vector<wspair> wspvector;
 
 class PlayerMenu : public virtual CommonMenu
 {
+private:
+	ZPlay *player;
+	bool audio_init = true;
 protected:
 	svector loaded_music;
 	
@@ -33,8 +35,7 @@ protected:
 	
 	wspvector current_play_list;
 	int current_play_list_pos;
-	float volume       = 1.0f;
-	int volume_percent = 100;	
+	int volume = 100;	
 public:
 	PlayerMenu();
 	virtual ~PlayerMenu();
@@ -56,7 +57,7 @@ private:
 							   const wstring& artist, 
 							   const wstring& album,
 							   const wstring& title);
-	PlayTime* compute_time(const string& path_to_file);
+	PlayTime* compute_time(int time);
 };
 };
 
