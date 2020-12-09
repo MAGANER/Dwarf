@@ -58,6 +58,7 @@ void PlayerMenu::run_playing_composition(const vector<MusicData*>& _music,
 	COORD help2 = {5,19};
 	COORD help3 = {5,20};
 	COORD help4 = {5,21};
+	COORD help5 = {5,22};
 	//
 	
 	
@@ -68,7 +69,7 @@ void PlayerMenu::run_playing_composition(const vector<MusicData*>& _music,
 	bool pause= false;
 	bool space_isnt_pressed = true;
 	bool n_isnt_pressed     = true;
-	bool r_isnt_pressed      = true;
+	bool r_isnt_pressed     = true;
 	bool stop = false;
 	
 	
@@ -105,6 +106,7 @@ void PlayerMenu::run_playing_composition(const vector<MusicData*>& _music,
 		draw_string("SPACE to pause/unpause",green_label,help2);
 		draw_string("r to set repeat on/off",green_label,help3);
 		draw_string("n to play/(not) next song",green_label,help4);
+		draw_string("c to set new song position",green_label,help5);
 		
 		
 		bool can_play_next = current_play_list_pos+1 < current_play_list.size();
@@ -228,6 +230,13 @@ void PlayerMenu::run_playing_composition(const vector<MusicData*>& _music,
 			{
 				play_next_after_finishing = false;
 				n_isnt_pressed = false;
+			}
+			
+			//set new song position
+			if(input == C)
+			{
+				clear();
+				set_song_position(hr,min,sec);
 			}
 			
 			n_isnt_pressed      = true;
@@ -404,4 +413,100 @@ void PlayerMenu::draw_position(const COORD& label_pos)
 		draw_string(pos,standart,label_pos);
 	}
 	delete _time;
+}
+void PlayerMenu::set_song_position(int hrs,int mins,int secs)
+{
+	COORD label_pos = {4,10};
+	string label    = "new_pos=";
+	
+	COORD help1 = {4,15};
+	COORD help2 = {4,16};
+	
+	int hour   = 0;
+	int minute = 0;
+	int second = 0;
+	
+	
+	bool dir = true;
+	int current= 0;
+	while(true)
+	{
+		string hour_str = to_string(hour);
+		short hour_x = 4+label.size();
+		
+		string minute_str = to_string(minute);
+		short minute_x = hour_x+2;
+		
+		string second_str = to_string(second);
+		short second_x = minute_x+2;
+		
+		draw_string("space to move",green_label,help1);
+		draw_string("+/- to change value",green_label,help2);
+		
+		draw_string(label,standart,label_pos);
+		if(current == 0) draw_string(hour_str,red_label,COORD{hour_x,10});
+		else draw_string(hour_str,standart,COORD{hour_x,10});
+		
+		if(current == 1) draw_string(minute_str,red_label,COORD{minute_x,10});
+		else draw_string(minute_str,standart,COORD{minute_x,10});
+
+		if(current == 2) draw_string(second_str,red_label,COORD{second_x,10});
+		else draw_string(second_str,standart,COORD{second_x,10});
+		
+		short separator_pos1 = hour_x+1;
+		short separator_pos2 = minute_x+1;
+		
+		draw_string(":",standart,COORD{separator_pos1,10});
+		draw_string(":",standart,COORD{separator_pos2,10});
+		
+		int input = getch();
+		if(input == ESCAPE) break;
+		if(input == SPACE)
+		{
+			if(current == 2) dir = false;
+			if(current == 0) dir = true;
+			if(dir)current++;
+			else current--;
+		}
+		
+		if(input == PLUS)
+		{
+			if(current == 0 && hour < hrs)
+			{
+				hour++;
+			}
+			if(current == 1 && minute < mins)
+			{
+				minute++;
+			}
+			if(current == 2 && second < secs)
+			{
+				second++;
+			}
+		}
+		if(input == MINUS)
+		{
+			if(current == 0 && hour < hrs)
+			{
+				hour--;
+			}
+			if(current == 1 && minute < mins)
+			{
+				minute--;
+			}
+			if(current == 2 && second < secs)
+			{
+				second--;
+			}			
+		}	
+	}
+	clear();
+	
+	TStreamTime time;
+	time.sec = to_seconds(hour,minute,second);
+	player->Seek(tfSecond,&time,smFromBeginning);
+}
+int PlayerMenu::to_seconds(int hrs,int mins,int secs)
+{
+	return secs+(mins*60)+(hrs*3600);
 }

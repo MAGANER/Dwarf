@@ -60,6 +60,8 @@ private:
 	PlayTime* compute_time(int time);
 	
 	void draw_position(const COORD& label_pos);
+	void set_song_position(int hrs,int mins,int secs);
+	int to_seconds(int hrs,int mins,int secs);
 };
 };
 
