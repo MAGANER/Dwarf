@@ -58,6 +58,8 @@ private:
 							   const wstring& album,
 							   const wstring& title);
 	PlayTime* compute_time(int time);
+	
+	void draw_position(const COORD& label_pos);
 };
 };
 

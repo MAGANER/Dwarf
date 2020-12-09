@@ -46,12 +46,13 @@ void PlayerMenu::run_playing_composition(const vector<MusicData*>& _music,
 	COORD genre_pos   ={4,5};
 	COORD volume_pos  ={4,7};
 	COORD length_pos  ={4,8};
-	COORD curr_pos_pos={4,9};
-	COORD next_pos    ={4,10};
+	COORD pos_label_pos={4,9};
+	COORD curr_pos_pos={4,10};
+	COORD next_pos    ={4,11};
 	
-	COORD play_next_pos = {4,12};
-	COORD repeat_pos    = {4,13};
-	COORD pause_pos     = {4,14};
+	COORD play_next_pos = {4,13};
+	COORD repeat_pos    = {4,14};
+	COORD pause_pos     = {4,15};
 
 	COORD help1 = {5,18};
 	COORD help2 = {5,19};
@@ -154,7 +155,7 @@ void PlayerMenu::run_playing_composition(const vector<MusicData*>& _music,
 		
 		string length="length="+to_string(hr)+":"+to_string(min)+":"+to_string(sec);
 		draw_string(length,standart,length_pos);
-		
+		draw_position(pos_label_pos);
 		
 		player->GetStatus(&status);
 		bool not_playing = status.fPlay == 0 && !pause;
@@ -233,6 +234,7 @@ void PlayerMenu::run_playing_composition(const vector<MusicData*>& _music,
 			r_isnt_pressed      = true; 
 			space_isnt_pressed  = true;
 		}
+		
 		
 		Sleep(10);
 	}
@@ -385,4 +387,21 @@ PlayTime* PlayerMenu::compute_time(int time)
 	}
 	
 	return new PlayTime(hours,mins,secs);	
+}
+void PlayerMenu::draw_position(const COORD& label_pos)
+{
+	TStreamTime time;
+	
+	player->GetPosition(&time);
+	PlayTime* _time = compute_time(time.ms);
+	if(_time != nullptr)
+	{
+		int hr = _time->hour;
+		int min= _time->minutes;
+		int sec= _time->secs;
+	
+		string pos = "position="+to_string(hr)+":"+to_string(min)+":"+to_string(sec);
+		draw_string(pos,standart,label_pos);
+	}
+	delete _time;
 }
