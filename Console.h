@@ -58,6 +58,7 @@ public:
 		SPACE  = 32,
 		R      = 114,
 		N      = 110,
+		C      = 99,
 	};
 public:
 	Console();
