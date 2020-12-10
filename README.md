@@ -14,6 +14,8 @@ Here i show you what is done and what is going to be done.
 - [ ] Make groups(extended playlists).
 - [ ] Make GUI.
 - [ ] Make full support for Unicode in Console.
+- [ ] Make ability to see 'raw' music(that has no tags)
+- [ ] Make it able to play music, passed as command line argument
 
 ### Dependencies:
 In this project i used:
