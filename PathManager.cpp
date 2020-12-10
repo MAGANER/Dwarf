@@ -48,7 +48,7 @@ void PathManager::add_new_search_paths(const std::string& value)
 		}
 	}
 }
-void PathManager::get_music_files()
+void PathManager::get_music_files(bool smart_sort)
 {
 	for(auto& spath: searching_paths)
 	{
@@ -66,6 +66,15 @@ void PathManager::get_music_files()
 					TagLib::FileRef f(str.c_str());
 					TagLib::Tag *tag = f.tag();
 					std::wstring artist = tag->artist().toWString();
+					
+					if(smart_sort)
+					{
+						wspair result = does_val_exist(artist);
+						if(result.first == L"artist")
+						{
+							artist = result.second;
+						}
+					}
 					std::wstring title  = tag->title().toWString();
 					std::wstring album  = tag->album().toWString();
 					std::wstring genre  = tag->genre().toWString();
@@ -105,4 +114,29 @@ wstring PathManager::fix_path_slash(const std::wstring& path)
 		else new_+=L"/";
 	}
 	return new_;
-}		
+}
+wspair PathManager::does_val_exist(const std::wstring& value)
+{
+	using namespace std;
+	wstring val = clear_str(value);
+	for(auto& file:music)
+	{
+		wstring artist = clear_str(file->artist);
+		wstring album  = clear_str(file->album);
+		wstring genre  = clear_str(file->genre);
+		wstring title  = clear_str(file->title);
+		
+		if(val == artist) return wspair(L"artist",val);
+		if(val == album)  return wspair(L"album", val);
+		if(val == genre)  return wspair(L"genre", val);
+		if(val == title)  return wspair(L"title", val);
+	}
+	return wspair(L"",L"");
+}	
+std::wstring PathManager::clear_str(const std::wstring& str)
+{
+	//delete spaces and set all chars to lower case
+	std::wstring new_str;
+	for(auto& ch:str) if(!isspace(ch)) new_str.push_back(tolower(ch));
+	return new_str;
+}

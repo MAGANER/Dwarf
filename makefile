@@ -1,55 +1,59 @@
 #libraries
-IRK_KLANG_INCS = -I"E:/irrKlang/include/"
-irk_klang_lib  = E:/irrKlang/lib/Win32-gcc/libirrKlang.a
-
 TAGLIB_INCS = -I"E:/taglib-1.10/taglib/" -I"E:/taglib-1.10/taglib/toolkit/" -I"E:/taglib-1.10/build/"
 taglib      = E:/taglib-1.10/build/taglib/libtag.dll.a
 
+libzplay_incs = -I"E:/libzplay/C++/"
+libzplay_lib  = E:/libzplay/C++/libzplay.a
+
 
 #common compiler data
-INCS     = -I"E:/cpp_projects/DwarfAudioPlayer" $(TAGLIB_INCS) $(IRK_KLANG_INCS)
+INCS     = -I"E:/cpp_projects/DwarfAudioPlayer" $(TAGLIB_INCS) $(libzplay_incs)
 CPP      = g++.exe
-FLAG     = $(INCS) -std=c++17 -pthread -g3 
+FLAG     = $(INCS) -std=c++17 -g3 
 
 
 #object files
-objects 		  = main.o app.o console.o CommonMenu.o Player.o AlbumMenu.o ArtistMenu.o GenreMenu.o SearchMenu.o
+objects 		  = main.o app.o console.o CommonMenu.o PlayerMenu.o PathManager.o ConfigLoader.o AlbumMenu.o ArtistMenu.o GenreMenu.o SearchMenu.o
 bublegum_objects  = ErrorPrinter.o TypeChecker.o Memory.o VirtualMachine.o
 
 
 dwarf : $(objects) $(bublegum_objects) 
-	$(CPP) -o build/dwarf $(objects) $(bublegum_objects) $(taglib) $(irk_klang_lib)
+	$(CPP) -o build/dwarf $(objects) $(bublegum_objects) $(taglib) $(libzplay_lib)
 
 #main programm
 
 ArtistMenu.o : ArtistMenu.cpp
-	$(CPP) -c ArtistMenu.cpp ArtistMenu.h $(FLAG)
+	$(CPP) -c ArtistMenu.cpp ArtistMenu.h AlbumMenu.h $(FLAG)
 
 AlbumMenu.o : AlbumMenu.cpp
-	$(CPP) -c AlbumMenu.cpp AlbumMenu.h $(FLAG)
+	$(CPP) -c AlbumMenu.cpp AlbumMenu.h PlayerMenu.h $(FLAG)
 
 CommonMenu.o : CommonMenu.cpp
 	$(CPP) -c CommonMenu.cpp CommonMenu.h $(FLAG)
 
 GenreMenu.o : GenreMenu.cpp
-	$(CPP) -c GenreMenu.cpp GenreMenu.h $(FLAG)
+	$(CPP) -c GenreMenu.cpp GenreMenu.h ArtistMenu.h $(FLAG)
 
 SearchMenu.o : SearchMenu.cpp
-	$(CPP) -c SearchMenu.cpp SearchMenu.h $(FLAG)
+	$(CPP) -c SearchMenu.cpp SearchMenu.h GenreMenu.h $(FLAG)
 
-Player.o : Player.cpp
-	$(CPP) -c Player.cpp Player.h $(FLAG)
+PlayerMenu.o : PlayerMenu.cpp
+	$(CPP) -c PlayerMenu.cpp PlayerMenu.h CommonMenu.h $(FLAG)
 
-headers = app.h console.h MusicData.h CommonMenu.h SearchMenu.h GenreMenu.h ArtistMenu.h PlayTime.h VirtualMachine/VirtualMachine.h  Player.h  AlbumMenu.h
-		  
+ConfigLoader.o : ConfigLoader.cpp
+	$(CPP) -c ConfigLoader.cpp ConfigLoader.h Pos.h ErrorProcessor.h SearchMenu.h VirtualMachine/VirtualMachine.h $(FLAG)
+
+PathManager.o : PathManager.cpp
+	$(CPP) -c PathManager.cpp PathManager.h ErrorProcessor.h $(FLAG)
+
 app.o : app.cpp 
-	$(CPP) -c app.cpp $(headers) $(FLAG)
+	$(CPP) -c app.cpp app.h SearchMenu.h ConfigLoader.h PathManager.h $(FLAG)
 
 console.o : console.cpp
-	$(CPP) -c console.cpp console.h $(FLAG)
+	$(CPP) -c console.cpp console.h Pos.h $(FLAG)
 
 main.o : main.cpp
-	$(CPP) -c main.cpp app.h $(FLAG)
+	$(CPP) -c main.cpp app.h ConfigLoader.h $(FLAG)
 
 
 #Bubblegum

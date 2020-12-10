@@ -15,7 +15,7 @@ App::App()
 	size = get_terminal_size();
 	max_path_char_number = get_max_path_char_number();
 	
-	get_music_files();
+	get_music_files(smart_sort);
 	set_terminal_size();
 	clear();
 	
