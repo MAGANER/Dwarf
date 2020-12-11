@@ -58,6 +58,8 @@ void PlayerMenu::run_playing_composition(const vector<MusicData*>& _music,
 	draw_there_is_no_ability_to_play();
 	while(!stop && audio_init)
 	{
+		bool not_out_of_playlist = current_play_list_pos < current_play_list.size(); 
+		if(not_out_of_playlist){
 		player->SetMasterVolume(volume,volume);
 		
 		draw_composition_status(false);
@@ -73,6 +75,8 @@ void PlayerMenu::run_playing_composition(const vector<MusicData*>& _music,
 		Sleep(10);
 		
 		if(break_playing) break;
+		
+		}else break;
 	}
 	
 	clear();

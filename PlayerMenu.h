@@ -66,6 +66,7 @@ private:
 	bool r_isnt_pressed     = true;
 	bool stop = false;
 	bool can_play_next;
+	
 	void set_managing_vars();
 	
 	bool break_playing = false;
