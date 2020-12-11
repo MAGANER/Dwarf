@@ -67,14 +67,6 @@ void PathManager::get_music_files(bool smart_sort)
 					TagLib::Tag *tag = f.tag();
 					std::wstring artist = tag->artist().toWString();
 					
-					if(smart_sort)
-					{
-						wspair result = does_val_exist(artist);
-						if(result.first == L"artist")
-						{
-							artist = result.second;
-						}
-					}
 					std::wstring title  = tag->title().toWString();
 					std::wstring album  = tag->album().toWString();
 					std::wstring genre  = tag->genre().toWString();
