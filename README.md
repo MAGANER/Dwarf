@@ -7,6 +7,8 @@ But it is still a good player, so i want to make it grow.
 
 Current Version is 1.0.
 
+Supported formats: mp3.
+
 ### TODO list:
 Here i show you what is done and what is going to be done.
 - [x] Make basical player application(sorting, loading, playing).
@@ -17,6 +19,7 @@ Here i show you what is done and what is going to be done.
 - [x] Make ability to see 'raw' music(that has no tags)
 - [ ] Make it able to play music, passed as command line argument
 - [ ] (Optional)Make smart sorting. For example Alterac and alterac are the same names.
+- [ ] Make better audio file tag processing.
 
 ### Dependencies:
 In this project i used:
