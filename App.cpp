@@ -150,10 +150,11 @@ void App::run_base_menu_list()
 		"Albums",
 		"Artists",
 		"Genres",
+		"Raw music"
 	};
 	
 	int min = 1;
-	int max = 4;
+	int max = 5;
 	int current = 1;
 	while(true)
 	{
@@ -182,6 +183,7 @@ void App::run_base_menu_list()
 			if(current == Genres) run_list_genres(music);
 			if(current == Artists)run_list_artists(music,L"");
 			if(current == Albums) run_list_albums(music,L"",L"");
+			if(current == RawMusic)show_raw_music_list();
 			break;
 		}
 		pos.Y = 5;

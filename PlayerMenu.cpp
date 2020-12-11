@@ -24,233 +24,260 @@ PlayerMenu::~PlayerMenu()
 	player->Release();
 }
 
+
+void PlayerMenu::set_managing_vars()
+{
+	repeat = false;
+	play_next_after_finishing = true;
+	play = false;
+	pause= false;
+	space_isnt_pressed = true;
+	n_isnt_pressed     = true;
+	r_isnt_pressed     = true;
+	stop = false;
+	break_playing = false;
+}
 void PlayerMenu::run_playing_composition(const vector<MusicData*>& _music,
 										 const wstring& artist,
 								         const wstring& album,
-								         const wspair& title)
+								         const wspair&  title)
 {	
+	set_managing_vars();
 	clear();
 
-	wstring _genre = get_genre_of_title(_music,artist,album,title.first);
-	wstring _path = title.second;
-	string path  = convert_wstring_to_std(_path); 
+	current_artist = artist;
+	current_album  = album;
+	current_title  = title.first;
+	current_genre  = get_genre_of_title(_music,artist,album,title.first);
 	
+	wstring _path  = title.second;
+	string path    = convert_wstring_to_std(_path); 
+				
 	
-	//label positions
-	wstring label = L"Playing:";
-	COORD label_pos = {2,0};
+	can_play_next = current_play_list_pos+1 < current_play_list.size();
+	draw_there_is_no_ability_to_play();
+	while(!stop && audio_init)
+	{
+		player->SetMasterVolume(volume,volume);
+		
+		draw_composition_status(false);
+		
+		load_composition(path);
+		
+		draw_length();
+		draw_position(pos_label_pos);
+		draw_help_info();
+		
+		process_playing_cycle();
+		process_input();
+		Sleep(10);
+		
+		if(break_playing) break;
+	}
 	
-	COORD title_pos   ={4,2};
-	COORD artist_pos  ={4,3};
-	COORD album_pos   ={4,4};
-	COORD genre_pos   ={4,5};
-	COORD volume_pos  ={4,7};
-	COORD length_pos  ={4,8};
-	COORD pos_label_pos={4,9};
-	COORD curr_pos_pos={4,10};
-	COORD next_pos    ={4,11};
+	clear();
+}
+void PlayerMenu::play_raw_music(const wstring& output_path,
+								const wstring& real_path)
+{
+	set_managing_vars();
+	clear();
 	
-	COORD play_next_pos = {4,13};
-	COORD repeat_pos    = {4,14};
-	COORD pause_pos     = {4,15};
+	current_title  = output_path;
 
-	COORD help1 = {5,18};
-	COORD help2 = {5,19};
-	COORD help3 = {5,20};
-	COORD help4 = {5,21};
-	COORD help5 = {5,22};
-	//
+	can_play_next = current_play_list_pos+1 < current_play_list.size();
+	draw_there_is_no_ability_to_play();
+	while(!stop && audio_init)
+	{
+		player->SetMasterVolume(volume,volume);
+		
+		draw_string(current_title,standart,title_pos);
+		
+		load_composition(convert_wstring_to_std(real_path));
+		
+		draw_length();
+		draw_position(pos_label_pos);
+		draw_help_info();
+		draw_composition_status(true);
+		
+		
+		process_playing_cycle();
+		process_input();
+		Sleep(10);
+		
+		if(break_playing) break;
+	}
 	
-	
-	//logical variables
-	bool repeat = false;
-	bool play_next_after_finishing = true;
-	bool play = false;
-	bool pause= false;
-	bool space_isnt_pressed = true;
-	bool n_isnt_pressed     = true;
-	bool r_isnt_pressed     = true;
-	bool stop = false;
-	
-	
-	//time
-	int hr, min, sec;
-	
-	TStreamInfo info;
-	TStreamStatus status;
-	
+	clear();	
+}
+void PlayerMenu::draw_there_is_no_ability_to_play()
+{
 	if(!audio_init)
 	{
 		cout<<"It is not unable to play music!"<<endl;
 		system("pause");
 	}
-	while(!stop && audio_init)
-	{
-		player->SetMasterVolume(volume,volume);
-		
-		string vol_val = to_string(volume);	
-		if(volume < 100) vol_val = get_substr(vol_val,0,2);
-		if(volume < 10)   vol_val= get_substr(vol_val,0,1);
-		vol_val+="%% ";
-		string volume_str = "volume:"+vol_val;
-
-		draw_string(label,red_label,label_pos);
-		
-		draw_string(L"Title:"+title.first,standart,title_pos);
-		draw_string(L"Artist:"+artist,standart,artist_pos);
-		draw_string(L"Album:"+album,standart,album_pos);
-		draw_string(L"Genre:"+_genre,standart,genre_pos);
-		draw_string(volume_str,standart,volume_pos);
-		
-		draw_string("+/- to change volume",green_label,help1);
-		draw_string("SPACE to pause/unpause",green_label,help2);
-		draw_string("r to set repeat on/off",green_label,help3);
-		draw_string("n to play/(not) next song",green_label,help4);
-		draw_string("c to set new song position",green_label,help5);
-		
-		
-		bool can_play_next = current_play_list_pos+1 < current_play_list.size();
-		if(can_play_next)
-		{
-			wstring next_song = current_play_list[current_play_list_pos+1].first;
-			draw_string(L"next:"+next_song,standart,next_pos);
-		}
-		else
-		{
-			draw_string("next:None",standart,next_pos);
-		}
-		
-		string play_next_option = play_next_after_finishing?"on  ":"off ";
-		draw_string("play next after current song:"+play_next_option,magenta_label,play_next_pos);
-		
-		string repeat_option = repeat?"on  ":"off ";
-		draw_string("repeat:"+repeat_option,magenta_label,repeat_pos);
-		
-		string pause_option = pause?"on  ":"off ";
-		draw_string("pause:"+pause_option,magenta_label,pause_pos);
-		
-		if(!play)
-		{
-			if(player->OpenFile(path.c_str(),sfAutodetect) == 0)
-			{
-				cout<<"can not open "+path<<endl;
-				getch();
-				break;
-			}
-					
-			if(player->Play() == 0)
-			{
-				cout<<"can not play "+path+"!"<<endl;
-				getch();
-				break;
-			}
-			player->GetStreamInfo(&info);
-			
-			PlayTime* time = compute_time(info.Length.ms);
-			hr = time->hour;
-			min= time->minutes;
-			sec= time->secs;
-			delete time;
-			
-			play = true;
-		}
-		
-		
-		string length="length="+to_string(hr)+":"+to_string(min)+":"+to_string(sec);
-		draw_string(length,standart,length_pos);
-		draw_position(pos_label_pos);
-		
-		player->GetStatus(&status);
-		bool not_playing = status.fPlay == 0 && !pause;
-		
-		if(not_playing && !repeat && !can_play_next) stop = true;
-		if(not_playing && repeat) player->Play();
-		if(not_playing && !repeat && play_next_after_finishing && can_play_next)
-		{
-			play_next = true;
-			stop = true;
-		}
-
-		
-		if(kbhit())
-		{
-			int input = _getch();
-		
-			if(input == ESCAPE) 
-			{
-				player->Close();
-				play_next = false;
-				break;
-			}
-			
-			//change volume
-			if(input == PLUS && volume < 100)
-			{
-				++volume;
-				player->SetMasterVolume(volume,volume);
-			}
-			if(input == MINUS && volume > 0)
-			{
-				--volume;
-				player->SetMasterVolume(volume,volume);
-			}
-			
-			//pause 
-			if(input == SPACE && !pause && space_isnt_pressed) 
-			{
-				player->Pause();
-				pause = true;
-				space_isnt_pressed = false;
-			}
-			if(input == SPACE &&  pause && space_isnt_pressed) 
-			{
-				player->Resume();
-				pause = false;
-				space_isnt_pressed = false;
-			}
-			
-			//repeat
-			if(input == R && !repeat && r_isnt_pressed)
-			{
-				repeat = true;
-				r_isnt_pressed = false;
-			}
-			if(input == R && repeat && r_isnt_pressed)
-			{
-				repeat = false;
-				r_isnt_pressed = false;
-			}
-		
-			//play next song
-			if(input == N && !play_next_after_finishing && n_isnt_pressed)
-			{
-				play_next_after_finishing = true;
-				n_isnt_pressed = false;
-			}
-			if(input == N && play_next_after_finishing && n_isnt_pressed)
-			{
-				play_next_after_finishing = false;
-				n_isnt_pressed = false;
-			}
-			
-			//set new song position
-			if(input == C)
-			{
-				clear();
-				set_song_position(hr,min,sec);
-			}
-			
-			n_isnt_pressed      = true;
-			r_isnt_pressed      = true; 
-			space_isnt_pressed  = true;
-		}
-		
-		
-		Sleep(10);
-	}
-	
-	clear();
 }
+void PlayerMenu::draw_composition_status(bool raw_music)
+{
+	string vol_val = to_string(volume);	
+	if(volume < 100) vol_val = get_substr(vol_val,0,2);
+	if(volume < 10)   vol_val= get_substr(vol_val,0,1);
+	vol_val+="%% ";
+	string volume_str = "volume:"+vol_val;
+
+	draw_string(label,red_label,label_pos);
+	
+	if(!raw_music)
+	{
+		draw_string(L"Title:" + current_title,  standart, title_pos);
+		draw_string(L"Artist:"+ current_artist, standart, artist_pos);
+		draw_string(L"Album:" + current_album,  standart, album_pos);
+		draw_string(L"Genre:" + current_genre,  standart, genre_pos);
+	}
+	draw_string(volume_str, standart, volume_pos);
+			
+	if(can_play_next)
+	{
+		wstring next_song = current_play_list[current_play_list_pos+1].first;
+		draw_string(L"next:"+next_song,standart,next_pos);
+	}
+	else
+	{
+		draw_string("next:None",standart,next_pos);
+	}
+		
+	string play_next_option = play_next_after_finishing?"on  ":"off ";
+	draw_string("play next after current song:"+play_next_option,magenta_label,play_next_pos);
+	
+	string repeat_option = repeat?"on  ":"off ";
+	draw_string("repeat:"+repeat_option,magenta_label,repeat_pos);
+		
+	string pause_option = pause?"on  ":"off ";
+	draw_string("pause:"+pause_option,magenta_label,pause_pos);	
+}
+void PlayerMenu::load_composition(const string& path)
+{
+	if(!play)
+	{
+		if(player->OpenFile(path.c_str(),sfAutodetect) == 0)
+		{
+			cout<<"can not open "+path<<endl;
+			getch();
+			break_playing = true;
+		}
+					
+		if(player->Play() == 0)
+		{
+			cout<<"can not play "+path+"!"<<endl;
+			getch();
+			break_playing = true;
+		}
+		player->GetStreamInfo(&info);
+			
+		PlayTime* time = compute_time(info.Length.ms);
+		hr = time->hour;
+		min= time->minutes;
+		sec= time->secs;
+		delete time;
+			
+		play = true;
+	}	
+}
+void PlayerMenu::draw_length()
+{
+	string length="length="+to_string(hr)+":"+to_string(min)+":"+to_string(sec);
+	draw_string(length,standart,length_pos);
+}
+void PlayerMenu::process_playing_cycle()
+{
+	player->GetStatus(&status);
+	bool not_playing = status.fPlay == 0 && !pause;
+		
+	if(not_playing && !repeat && !can_play_next) stop = true;
+	if(not_playing && repeat) player->Play();
+	if(not_playing && !repeat && play_next_after_finishing && can_play_next)
+	{
+		play_next = true;
+		stop = true;
+	}	
+}
+void PlayerMenu::process_input()
+{
+	if(kbhit())
+	{
+		int input = _getch();
+		
+		if(input == ESCAPE) 
+		{
+			player->Close();
+			play_next = false;
+			break_playing = true;
+		}
+			
+		//change volume
+		if(input == PLUS && volume < 100)
+		{
+			++volume;
+			player->SetMasterVolume(volume,volume);
+		}
+		if(input == MINUS && volume > 0)
+		{
+			--volume;
+			player->SetMasterVolume(volume,volume);
+		}
+			
+		//pause 
+		if(input == SPACE && !pause && space_isnt_pressed) 
+		{
+			player->Pause();
+			pause = true;
+			space_isnt_pressed = false;
+		}
+		if(input == SPACE &&  pause && space_isnt_pressed) 
+		{
+			player->Resume();
+			pause = false;
+			space_isnt_pressed = false;
+		}
+			
+		//repeat
+		if(input == R && !repeat && r_isnt_pressed)
+		{
+			repeat = true;
+			r_isnt_pressed = false;
+		}
+		if(input == R && repeat && r_isnt_pressed)
+		{
+			repeat = false;
+			r_isnt_pressed = false;
+		}
+		
+		//play next song
+		if(input == N && !play_next_after_finishing && n_isnt_pressed)
+		{
+			play_next_after_finishing = true;
+			n_isnt_pressed = false;
+		}
+		if(input == N && play_next_after_finishing && n_isnt_pressed)
+		{
+			play_next_after_finishing = false;
+			n_isnt_pressed = false;
+		}
+			
+		//set new song position
+		if(input == C)
+		{
+			clear();
+			set_song_position(hr,min,sec);
+		}
+			
+		n_isnt_pressed      = true;
+		r_isnt_pressed      = true; 
+		space_isnt_pressed  = true;
+	}
+}
+
 void PlayerMenu::run_list_titles(const vector<MusicData*>& data,
 							 const wstring& genre,
 							 const wstring& artist, 
@@ -414,6 +441,14 @@ void PlayerMenu::draw_position(const COORD& label_pos)
 		draw_string(pos,standart,label_pos);
 	}
 	delete _time;
+}
+void PlayerMenu::draw_help_info()
+{
+	draw_string("+/- to change volume",      green_label, help1);
+	draw_string("SPACE to pause/unpause",    green_label, help2);
+	draw_string("r to set repeat on/off",    green_label, help3);
+	draw_string("n to play/(not) next song", green_label, help4);
+	draw_string("c to set new song position",green_label, help5);	
 }
 void PlayerMenu::set_song_position(int hrs,int mins,int secs)
 {

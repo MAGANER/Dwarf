@@ -13,7 +13,7 @@ FLAG     = $(INCS) -std=c++17 -g3
 
 
 #object files
-objects 		  = main.o app.o console.o CommonMenu.o PlayerMenu.o PathManager.o ConfigLoader.o AlbumMenu.o ArtistMenu.o GenreMenu.o SearchMenu.o
+objects 		  = main.o app.o RawMusicMenu.o console.o CommonMenu.o PlayerMenu.o PathManager.o ConfigLoader.o AlbumMenu.o ArtistMenu.o GenreMenu.o SearchMenu.o
 bublegum_objects  = ErrorPrinter.o TypeChecker.o Memory.o VirtualMachine.o
 
 
@@ -46,8 +46,11 @@ ConfigLoader.o : ConfigLoader.cpp
 PathManager.o : PathManager.cpp
 	$(CPP) -c PathManager.cpp PathManager.h ErrorProcessor.h $(FLAG)
 
+RawMusicMenu.o : RawMusicMenu.cpp
+	$(CPP) -c RawMusicMenu.cpp RawMusicMenu.h PlayerMenu.h PathManager.h $(FLAG)
+
 app.o : app.cpp 
-	$(CPP) -c app.cpp app.h SearchMenu.h ConfigLoader.h PathManager.h $(FLAG)
+	$(CPP) -c app.cpp app.h SearchMenu.h ConfigLoader.h RawMusicMenu.h $(FLAG)
 
 console.o : console.cpp
 	$(CPP) -c console.cpp console.h Pos.h $(FLAG)

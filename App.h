@@ -9,13 +9,13 @@
 
 #include"ConfigLoader.h"
 #include"SearchMenu.h"
-#include"PathManager.h"
+#include"RawMusicMenu.h"
 
 namespace Dwarf
 {	
 class App: public SearchMenu,
 		   public ConfigLoader,
-		   public PathManager
+		   public RawMusicMenu
 {
 private:	
 	svector groups;
@@ -37,6 +37,7 @@ private:
 		Albums,
 		Artists,
 		Genres,
+		RawMusic,
 	};
 	enum music_data_type
 	{
