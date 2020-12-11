@@ -511,30 +511,30 @@ void PlayerMenu::set_song_position(int hrs,int mins,int secs)
 		
 		if(input == PLUS)
 		{
-			if(current == 0 && hour < hrs)
+			if(current == 0 && hour)
 			{
 				hour++;
 			}
-			if(current == 1 && minute < mins)
+			if(current == 1 && minute < 59)
 			{
 				minute++;
 			}
-			if(current == 2 && second < secs)
+			if(current == 2 && second < 59)
 			{
 				second++;
 			}
 		}
 		if(input == MINUS)
 		{
-			if(current == 0 && hour < hrs)
+			if(current == 0 && hour != 0)
 			{
 				hour--;
 			}
-			if(current == 1 && minute < mins)
+			if(current == 1 && minute != 0)
 			{
 				minute--;
 			}
-			if(current == 2 && second < secs)
+			if(current == 2 && second != 0)
 			{
 				second--;
 			}			
@@ -544,7 +544,10 @@ void PlayerMenu::set_song_position(int hrs,int mins,int secs)
 	
 	TStreamTime time;
 	time.sec = to_seconds(hour,minute,second);
-	player->Seek(tfSecond,&time,smFromBeginning);
+	
+	if(time.sec <= info.Length.ms) player->Seek(tfSecond,&time,smFromBeginning);
+	
+	if(pause)player->Pause();
 }
 int PlayerMenu::to_seconds(int hrs,int mins,int secs)
 {
