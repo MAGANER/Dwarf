@@ -170,22 +170,24 @@ void PlayerMenu::load_composition(const string& path)
 			getch();
 			break_playing = true;
 		}
-					
+		else
+		{			
 		if(player->Play() == 0)
 		{
 			cout<<"can not play "+path+"!"<<endl;
 			getch();
 			break_playing = true;
 		}
-		player->GetStreamInfo(&info);
+			player->GetStreamInfo(&info);
 			
-		PlayTime* time = compute_time(info.Length.ms);
-		hr = time->hour;
-		min= time->minutes;
-		sec= time->secs;
-		delete time;
+			PlayTime* time = compute_time(info.Length.ms);
+			hr = time->hour;
+			min= time->minutes;
+			sec= time->secs;
+			delete time;
 			
-		play = true;
+			play = true;
+		}
 	}	
 }
 void PlayerMenu::draw_length()
