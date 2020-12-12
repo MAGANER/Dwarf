@@ -19,7 +19,7 @@ Here i show you what is done and what is going to be done.
 - [x] Make ability to see 'raw' music(that has no tags)
 - [ ] Make it able to play music, passed as command line argument
 - [ ] (Optional)Make smart sorting. For example Alterac and alterac are the same names.
-- [ ] Make better audio file tag processing.
+- [x] Make better audio file tag processing.
 
 ### Dependencies:
 In this project i used:
