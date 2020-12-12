@@ -1,7 +1,19 @@
 #ifndef PATH_MANAGER_H
 #define PATH_MANAGER_H
-#include "fileref.h"
-#include "tag.h"
+
+
+#include "tbytevector.h"
+
+#include "mpeg/mpegfile.h"
+
+#include "mpeg/id3v2/id3v2tag.h"
+#include "mpeg/id3v2/id3v2frame.h"
+#include "mpeg/id3v2/id3v2header.h"
+
+#include "mpeg/id3v1/id3v1tag.h"
+
+#include "ape/apetag.h"
+
 #include"MusicData.h"
 #include"VirtualMachine/StrFunction.h"
 #include"ErrorProcessor.h"
@@ -11,6 +23,7 @@
 #include<filesystem>
 
 namespace fs = std::filesystem;
+using namespace TagLib;
 
 typedef std::vector<string> svector;
 typedef std::vector<wstring> wsvector;

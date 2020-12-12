@@ -63,27 +63,23 @@ void PathManager::get_music_files(bool smart_sort)
 				std::wstring extension = get_substr(str,point+1,str.size());
 				if(is_extension_able(extension))
 				{
-					TagLib::FileRef f(str.c_str());
-					TagLib::Tag *tag = f.tag();
-					std::wstring artist = tag->artist().toWString();
-					
-					std::wstring title  = tag->title().toWString();
-					std::wstring album  = tag->album().toWString();
-					std::wstring genre  = tag->genre().toWString();
-					unsigned int year= tag->year();
-					
-					bool empty = artist.empty() || 
-								 title.empty()  ||
-								 album.empty()  ||
-								 genre.empty();
-					if(empty)
+					MPEG::File f(str.c_str());
+					ID3v1::Tag *id3v1tag = f.ID3v1Tag();
+					if(id3v1tag)
 					{
-						raw_music.push_back(str);
+						std::wstring artist = id3v1tag->artist().toWString();
+					
+						std::wstring title  = id3v1tag->title().toWString();
+						std::wstring album  = id3v1tag->album().toWString();
+						std::wstring genre  = id3v1tag->genre().toWString();
+						unsigned int year= id3v1tag->year();
+						
+						MusicData* data = new MusicData(artist,title,album,genre,str,year);
+						music.push_back(data);	
 					}
 					else
 					{
-						MusicData* data = new MusicData(artist,title,album,genre,str,year);
-						music.push_back(data);
+						raw_music.push_back(str);
 					}
 				}
 			}
