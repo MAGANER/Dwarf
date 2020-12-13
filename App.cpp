@@ -13,14 +13,18 @@ App::App()
 		load_config();
 		search_path = "data/paths.txt";
 	}
+	else if(fs::exists("C:/dwarf_data/config.bg"))
+	{
+	        search_path = "C:/dwarf_data/paths.txt";
+		load_config("C:/dwarf_data/config.bg");
+	}
 	else
 	{
-		cout<<"config file could not be found!"<<endl;
-		cout<<"please enter the path to folder with config!"<<endl;
-		string path;
-		cin>>path;
-		search_path = path+"/paths.txt";
-		load_config(path+"/config.bg");
+  		cout<<"config file could not be found!"<<endl;
+		cout<<"note:you can copy data folder to C:/, call it dwarf_data and it will be standart"<<endl;
+		getch();
+		exit(0);
+
 	}
 	
 	smart_sort   = is_smart_sort_enabled();
@@ -31,7 +35,7 @@ App::App()
 	get_music_files(smart_sort);
 	set_terminal_size();
 	clear();
-	
+
 	current_mode = working_modes::MainMenu;
 }
 App::~App()

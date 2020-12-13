@@ -16,7 +16,7 @@ svector PathManager::get_searching_paths(const string& path)
 	file.open(path);
 	if(!file)
 	{
-		process_error("can not open data/paths.txt!");
+		process_error("can not open "+path+"!");
 	}
 	
 	svector paths;
@@ -35,9 +35,16 @@ void PathManager::add_new_search_paths(const std::string& value, const string& f
 	bool exist = std::find(existing_paths.begin(),existing_paths.end(),value) != existing_paths.end();
 	if(!exist)
 	{
-		std::ofstream file("data/paths.txt",std::ios::out | std::ios::app);
-		if(file)
+		if(fs::exists("data/paths.txt"))
 		{
+		        std::ofstream file("data/paths.txt",std::ios::out | std::ios::app);
+			file<<endl;
+			file<<value;
+			file.close();
+		}
+		else if(fs::exists("C:/dwarf_data/paths.txt"))
+		{
+                        std::ofstream file("C:/dwarf_data/paths.txt",std::ios::out | std::ios::app);
 			file<<endl;
 			file<<value;
 			file.close();
