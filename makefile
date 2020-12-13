@@ -13,7 +13,7 @@ FLAG     = $(INCS) -std=c++17 -g3
 
 
 #object files
-objects 		  = main.o app.o RawMusicMenu.o console.o CommonMenu.o PlayerMenu.o PathManager.o ConfigLoader.o AlbumMenu.o ArtistMenu.o GenreMenu.o SearchMenu.o
+objects 		  = main.o app.o RawMusicMenu.o resources.o console.o CommonMenu.o PlayerMenu.o PathManager.o ConfigLoader.o AlbumMenu.o ArtistMenu.o GenreMenu.o SearchMenu.o
 bublegum_objects  = ErrorPrinter.o TypeChecker.o Memory.o VirtualMachine.o
 
 
