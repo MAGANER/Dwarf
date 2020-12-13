@@ -5,7 +5,7 @@ First of all, you should know it's free. The reason to make it free is simple. I
 
 But it is still a good player, so i want to make it grow.
 
-Current Version is 1.0.
+Current Version is 1.1.3.
 
 Supported formats: mp3.
 
