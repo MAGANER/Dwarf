@@ -17,7 +17,7 @@ Here i show you what is done and what is going to be done.
 - [ ] Make GUI.
 - [ ] Make full support for Unicode in Console.
 - [x] Make ability to see 'raw' music(that has no tags)
-- [ ] Make it able to play music, passed as command line argument
+- [x] Make it able to play music, passed as command line argument
 - [ ] (Optional)Make smart sorting. For example Alterac and alterac are the same names.
 - [x] Make better audio file tag processing.
 
