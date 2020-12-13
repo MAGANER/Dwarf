@@ -6,6 +6,7 @@
 
 #include<vector>
 #include<fstream>
+#include<codecvt>
 
 #include"ConfigLoader.h"
 #include"SearchMenu.h"
@@ -52,6 +53,7 @@ public:
 	App();
 	~App();
 	void run();
+	void set_custom_song_to_play(const string& path);
 private:		
 	//main menu stuff
 	void draw_label();

@@ -236,3 +236,18 @@ void App::run_list_groups()
 		elem_pos.Y = 1;
 	}
 }		   
+void App::set_custom_song_to_play(const string& path)
+{
+	if(!path.empty())
+	{
+		string output_path;
+		auto slash_pos = path.find_last_of("/");
+		if(slash_pos != string::npos)
+		{
+			output_path = get_substr(path,slash_pos+1,path.size()); 
+		}	else output_path = path;
+		
+		wstring_convert<codecvt_utf8_utf16<wchar_t>> converter;
+		play_raw_music(converter.from_bytes(output_path), converter.from_bytes(path));
+	}
+}
