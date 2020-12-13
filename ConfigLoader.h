@@ -20,6 +20,7 @@ public:
 	~ConfigLoader();
 	
 	void load_config();
+	void load_config(const string& custom_path);
 	Pos get_terminal_size();
 	int get_max_path_char_number();
 	bool is_smart_sort_enabled();

@@ -10,10 +10,10 @@ PathManager::~PathManager(){}
 
 
 
-svector PathManager::get_searching_paths()
+svector PathManager::get_searching_paths(const string& path)
 {
 	std::ifstream file;
-	file.open("data/paths.txt");
+	file.open(path);
 	if(!file)
 	{
 		process_error("can not open data/paths.txt!");
@@ -29,9 +29,9 @@ svector PathManager::get_searching_paths()
 	file.close();
 	return paths;
 }
-void PathManager::add_new_search_paths(const std::string& value)
+void PathManager::add_new_search_paths(const std::string& value, const string& file)
 {
-	svector existing_paths = get_searching_paths();
+	svector existing_paths = get_searching_paths(file);
 	bool exist = std::find(existing_paths.begin(),existing_paths.end(),value) != existing_paths.end();
 	if(!exist)
 	{

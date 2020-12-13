@@ -11,6 +11,12 @@ void ConfigLoader::load_config()
 	machine.check_braces_equality(script);
 	machine.run(script,"main");
 }
+void ConfigLoader::load_config(const string& custom_path)
+{
+	svector script = machine.load_script(custom_path.c_str());
+	machine.check_braces_equality(script);
+	machine.run(script,"main");
+}
 Pos ConfigLoader::get_terminal_size()
 {
 	bg::Module* main = machine.get_module("main");

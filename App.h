@@ -49,6 +49,7 @@ private:
 		
 	};
 	bool smart_sort;
+	string search_path;
 public:
 	App();
 	~App();

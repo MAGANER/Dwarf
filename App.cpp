@@ -8,10 +8,23 @@ App::App()
 	system("title Dwarf");
 	clear();
 	
-	load_config();
+	if(fs::exists("data/config.bg"))
+	{
+		load_config();
+		search_path = "data/paths.txt";
+	}
+	else
+	{
+		cout<<"config file could not be found!"<<endl;
+		cout<<"please enter the path to folder with config!"<<endl;
+		string path;
+		cin>>path;
+		search_path = path+"/paths.txt";
+		load_config(path+"/config.bg");
+	}
 	
 	smart_sort   = is_smart_sort_enabled();
-	searching_paths = get_searching_paths();
+	searching_paths = get_searching_paths(search_path);
 	size = get_terminal_size();
 	max_path_char_number = get_max_path_char_number();
 	
@@ -87,7 +100,7 @@ void App::run_add_menu()
 	bool already_exist = find(searching_paths.begin(),searching_paths.end(),path) != searching_paths.end();
 	if(!already_exist && exist)
 	{
-		add_new_search_paths(path);
+		add_new_search_paths(path,search_path);
 	}
 	current_mode = previos_mode;
 	previos_mode = working_modes::Add;
@@ -248,6 +261,13 @@ void App::set_custom_song_to_play(const string& path)
 		}	else output_path = path;
 		
 		wstring_convert<codecvt_utf8_utf16<wchar_t>> converter;
-		play_raw_music(converter.from_bytes(output_path), converter.from_bytes(path));
+		wstring real_path = converter.from_bytes(path);
+		auto pos = real_path.find_last_of(L".");
+		wstring extension = get_substr(real_path,pos+1,real_path.size());
+		if(!is_extension_able(extension))
+		{
+			wcout<<extension<<L" is not supported yet!Sorry :("<<endl;
+			getch();
+		}else play_raw_music(converter.from_bytes(output_path), real_path);
 	}
 }

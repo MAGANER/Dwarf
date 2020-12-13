@@ -41,11 +41,11 @@ public:
 	PathManager();
 	~PathManager();
 	
-	svector get_searching_paths();
+	svector get_searching_paths(const string& path);
 	void get_music_files(bool smart_sort);
 	bool is_extension_able(const std::wstring& extension);
 	wstring fix_path_slash(const std::wstring& path);
-	void add_new_search_paths(const std::string& value);
+	void add_new_search_paths(const std::string& value, const string& file);
 private:
 	wspair does_val_exist(const std::wstring& value);
 	std::wstring clear_str(const std::wstring& str);
