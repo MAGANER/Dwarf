@@ -60,7 +60,7 @@ void App::draw_label()
 	COORD pos;
 	pos.X = 28;
 	pos.Y = 0;
-	draw_string("Dwarf Audio Player",red_label,pos);	
+	Console::draw_string("Dwarf Audio Player",CommonMenu::red_label,pos);	
 }
 void App::draw_help()
 {
@@ -82,7 +82,7 @@ void App::draw_help()
 	for(size_t i = 0;i<text.size();++i)
 	{
 		if(i == 1)pos.X = 25;
-		draw_string(text[i],standart,pos);
+		Console::draw_string(text[i],CommonMenu::standart,pos);
 		++pos.Y;
 	}
 }
@@ -97,8 +97,8 @@ void App::run_add_menu()
 	COORD pos;
 	pos.X = 1;
 	pos.Y = 10;
-	draw_string("enter path, where can be found music:",standart,pos);
-	string path = get_path();
+	Console::draw_string("enter path, where can be found music:",CommonMenu::standart,pos);
+	string path = get_input();
 	
 	bool exist = fs::exists(path);
 	bool already_exist = find(searching_paths.begin(),searching_paths.end(),path) != searching_paths.end();
@@ -109,16 +109,6 @@ void App::run_add_menu()
 	current_mode = previos_mode;
 	previos_mode = working_modes::Add;
 	run_mode();
-}
-string App::get_path()
-{
-	string path;
-	const int size = sizeof(istream)/sizeof(char);
-	char* buffer = new char[size];
-	cin.getline(buffer,size);
-	path = buffer;
-	delete buffer;
-	return path;
 }
 void App::run_mode()
 {
@@ -178,8 +168,8 @@ void App::run_base_menu_list()
 		for(size_t i = 0;i<text.size();++i)
 		{
 			if(i == 1)pos.X = 25;
-			if(current != i)draw_string(text[i],standart,pos);
-			else draw_string(text[i],green_label,pos);
+			if(current != i)Console::draw_string(text[i],CommonMenu::standart,pos);
+			else Console::draw_string(text[i],CommonMenu::green_label,pos);
 			++pos.Y;
 		}
 		
@@ -196,7 +186,7 @@ void App::run_base_menu_list()
 		if(input == ENTER)
 		{
 			system("cls");
-			if(current == Groups) run_list_groups();
+			if(current == Groups) run_group_menu();
 			if(current == Genres) run_list_genres(music);
 			if(current == Artists)run_list_artists(music,L"");
 			if(current == Albums) run_list_albums(music,L"",L"");
@@ -209,50 +199,7 @@ void App::run_base_menu_list()
 	current_mode = previos_mode;
 	previos_mode = working_modes::List;
 	run_mode();
-}
-void App::run_list_groups()
-{
-	int current_elem = 0;
-	int start_counter = 0;
-	int max_counter   = groups.size()< visible_range?groups.size():visible_range;
-	COORD elem_pos{2,1};
-	while(true)
-	{
-		if(groups.empty())
-		{
-			COORD pos{10,5};
-			draw_string("you have no any group!",standart,pos);
-		}
-		else
-		{
-			for(int i = start_counter;i<max_counter;++i)
-			{
-				string text = to_string(i)+":"+groups[i];
-				if(current_elem == i)
-					draw_string(text,green_label,elem_pos);
-				else draw_string(text,standart,elem_pos);
-				++elem_pos.Y;
-			}
-		}
-		
-		int input = _getch();
-		if(input == ESCAPE) break;
-		if(input == MINUS && current_elem != 0) --current_elem;
-		if(input == PLUS  && current_elem < max_counter-1)++current_elem;
-		if(input == DOWN  && max_counter != groups.size())
-		{
-			++max_counter;
-			++start_counter;
-		}
-		if(input == UP    && start_counter != 0)
-		{
-			--max_counter;
-			--start_counter;
-		}
-
-		elem_pos.Y = 1;
-	}
-}		   
+}	   
 void App::set_custom_song_to_play(const string& path)
 {
 	if(!path.empty())

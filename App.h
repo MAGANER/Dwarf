@@ -6,21 +6,20 @@
 
 #include<vector>
 #include<fstream>
-#include<codecvt>
 
 #include"ConfigLoader.h"
 #include"SearchMenu.h"
 #include"RawMusicMenu.h"
+#include"GroupManager.h"
 
 namespace Dwarf
 {	
 class App: public SearchMenu,
 		   public ConfigLoader,
-		   public RawMusicMenu
+		   public RawMusicMenu,
+		   public GroupManager
 {
 private:	
-	svector groups;
-				
 	enum working_modes
 	{
 		MainMenu,
@@ -64,12 +63,10 @@ private:
 	
 	//adding menu stuff
 	void run_add_menu();
-	string get_path();
 	//.
 	
 	//listing menu stuff	
 	void run_base_menu_list();
-	void run_list_groups();
 	//.
 		
 	//common stuff

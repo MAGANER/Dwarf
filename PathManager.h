@@ -47,7 +47,7 @@ public:
 	wstring fix_path_slash(const std::wstring& path);
 	void add_new_search_paths(const std::string& value, const string& file);
 private:
-	wspair does_val_exist(const std::wstring& value);
+	std::wstring does_val_exist(const std::wstring& value);
 	std::wstring clear_str(const std::wstring& str);
 };
 };
