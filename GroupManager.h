@@ -1,6 +1,7 @@
 #ifndef GROUP_MANAGER_H
 #define GROUP_MANAGER_H
 #include"CommonMenu.h"
+#include"VirtualMachine/StrFunction.h"
 #include<codecvt>
 #include<locale>
 #include<filesystem>

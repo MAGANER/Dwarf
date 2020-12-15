@@ -2,7 +2,9 @@
 using namespace Dwarf;
 
 GroupManager::GroupManager()
-{}
+{
+	load_groups();
+}
 
 GroupManager::~GroupManager()
 {
@@ -133,5 +135,34 @@ void GroupManager::save_groups()
 		file.close();		
 	};
 	save("data/");
-	save("C:/data/");
+	save("C:/dwarf_data/");
+}
+void GroupManager::load_groups()
+{
+	auto load = [&](const string& path)
+	{
+		ifstream file(path+"groups.txt");
+		while(file)
+		{
+			string text;
+			file>>text;
+			if(!is_spacefull(text))
+			{
+				auto eq_pos = text.find("=");
+				string name = get_substr(text,0,eq_pos);
+				string val  = get_substr(text,eq_pos+1,text.size());
+				svector vals = separate_by_space(val);
+			
+				wstring_convert<codecvt_utf8_utf16<wchar_t>> converter;
+				wstring _name = converter.from_bytes(name);
+				wsvector _vals;
+				for(auto& __val: vals) _vals.push_back(converter.from_bytes(__val));
+			
+				group_pair _pair(_name,_vals);
+				groups.push_back(_pair);
+			}
+		}
+	};
+	load("data/");
+	load("C:/dwarf_data/");
 }
