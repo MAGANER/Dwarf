@@ -4,8 +4,11 @@
 #include<codecvt>
 #include<locale>
 #include<filesystem>
+#include<fstream>
 
 namespace fs=std::filesystem;
+
+typedef pair<wstring, vector<wstring> > group_pair; 
 namespace Dwarf
 {
 class GroupManager : public virtual CommonMenu
@@ -17,7 +20,7 @@ private:
 	COORD help3_pos = {25,17};
 	COORD help4_pos = {25,18};
 protected:
-	wsvector groups;
+	vector<group_pair> groups;
 public:
 	GroupManager();
 	virtual ~GroupManager();
@@ -27,9 +30,11 @@ public:
 	
 	string get_input();
 private:
+	vector<wstring> get_groups_name();
 	void load_groups();
+	
 	void save_groups();
-
+	wstring save_group_elements(const group_pair& group);
 };
 };
 #endif //GROUP_MANAGER_H

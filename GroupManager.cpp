@@ -5,10 +5,12 @@ GroupManager::GroupManager()
 {}
 
 GroupManager::~GroupManager()
-{}
+{
+}
 
 void GroupManager::show_groups()
 {	
+	wsvector groups = get_groups_name();
 	int max_counter    = groups.size() < visible_range? groups.size():visible_range;
 	int choosen_option = -1;
 	
@@ -75,13 +77,14 @@ void GroupManager::run_group_menu()
 			wstring_convert<codecvt_utf8_utf16<wchar_t>> converter;
 			wstring _name = converter.from_bytes(name);
 			
-			bool does_added = find(groups.begin(),groups.end(),_name) != groups.end();
-			if(!does_added) groups.push_back(_name);
+			vector<wstring> groups_names = get_groups_name();
+			bool does_added = find(groups_names.begin(),groups_names.end(),_name) != groups_names.end();
+			if(!does_added) groups.push_back(group_pair(_name,wsvector(0)));
 			system("cls");
 		}
 		if(input == SPACE) show_groups();
-		
 	}
+	save_groups();
 }
 string GroupManager::get_input()
 {
@@ -92,4 +95,43 @@ string GroupManager::get_input()
 	path = buffer;
 	delete buffer;
 	return path;
+}
+vector<wstring> GroupManager::get_groups_name()
+{
+	vector<wstring> names; 
+	for(auto& name:groups)
+	{
+		names.push_back(name.first);
+	}
+	return names;
+}
+wstring GroupManager::save_group_elements(const group_pair& group)
+{
+	wstring elements = L"(";
+	for(auto& elem:group.second)
+	{
+		elements+=elem+L" ";
+	}
+	elements+=L")";
+	return elements;
+}
+void GroupManager::save_groups()
+{
+	auto save =[&](const string& path)
+	{
+		ofstream file(path+"groups.txt");
+		for(auto& group:groups)
+		{
+			wstring name= group.first;
+			wstring val =L"="+save_group_elements(group);
+			
+			string to_save = string(name.begin(),name.end())+ string(val.begin(),name.end())+"\n";
+			to_save = get_substr(to_save,0,to_save.find(")")+1);
+			file<<to_save;
+			file<<endl;
+		}
+		file.close();		
+	};
+	save("data/");
+	save("C:/data/");
 }
