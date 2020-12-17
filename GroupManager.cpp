@@ -37,6 +37,39 @@ void GroupManager::show_groups()
 		if(choosen_option == current_elem)
 		{		
 			system("cls");
+			show_group_elements(this->groups[current_elem].second,this->groups[current_elem].first);
+			started = true;
+			choosen_option = -1;
+		}
+	}
+	system("cls");
+}
+void GroupManager::show_group_elements(const wsvector& elems, const wstring& group_name)
+{
+	int max_counter    = elems.size() < visible_range? elems.size():visible_range;
+	int choosen_option = -1;
+	
+	int start_counter = 0;
+	int current_elem  = 0;
+	bool started = true;
+	
+	while(true)
+	{
+		if(kbhit() || started)
+		{
+			run_common_list(elems,
+							choosen_option,
+							"there is no any group element!",
+							current_elem,
+							start_counter,
+							max_counter,
+							convert_wstring_to_std(group_name));
+			started = false;
+		}
+		if(choosen_option == -2) break;
+		if(choosen_option == current_elem)
+		{		
+			system("cls");
 			started = true;
 			choosen_option = -1;
 		}
@@ -103,7 +136,8 @@ vector<wstring> GroupManager::get_groups_name()
 	vector<wstring> names; 
 	for(auto& name:groups)
 	{
-		names.push_back(name.first);
+		auto exists = find(names.begin(),names.end(),name.first) != names.end();
+		if(!exists) names.push_back(name.first);
 	}
 	return names;
 }
