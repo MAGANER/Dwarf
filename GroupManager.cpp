@@ -33,6 +33,8 @@ void GroupManager::show_groups()
 							"groups:");
 			started = false;
 		}
+		
+		if(groups.empty()) break;
 		if(choosen_option == -2) break;
 		if(choosen_option == current_elem)
 		{		
