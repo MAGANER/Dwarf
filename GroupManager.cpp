@@ -119,7 +119,6 @@ void GroupManager::run_group_menu()
 		}
 		if(input == SPACE) show_groups();
 	}
-	save_groups();
 }
 string GroupManager::get_input()
 {
@@ -131,22 +130,12 @@ string GroupManager::get_input()
 	delete buffer;
 	return path;
 }
-vector<wstring> GroupManager::get_groups_name()
-{
-	vector<wstring> names; 
-	for(auto& name:groups)
-	{
-		auto exists = find(names.begin(),names.end(),name.first) != names.end();
-		if(!exists) names.push_back(name.first);
-	}
-	return names;
-}
 wstring GroupManager::save_group_elements(const group_pair& group)
 {
 	wstring elements = L"(";
 	for(auto& elem:group.second)
 	{
-		elements+=elem+L" ";
+		elements+=L"("+elem+L") ";
 	}
 	elements+=L")";
 	return elements;
@@ -156,13 +145,13 @@ void GroupManager::save_groups()
 	auto save =[&](const string& path)
 	{
 		ofstream file(path+"groups.txt");
+		file.clear();
 		for(auto& group:groups)
 		{
 			wstring name= group.first;
 			wstring val =L"="+save_group_elements(group);
 			
-			string to_save = string(name.begin(),name.end())+ string(val.begin(),name.end())+"\n";
-			to_save = get_substr(to_save,0,to_save.find(")")+1);
+			string to_save = convert_wstring_to_std(name)+convert_wstring_to_std(val);
 			file<<to_save;
 			file<<endl;
 		}
@@ -173,30 +162,30 @@ void GroupManager::save_groups()
 }
 void GroupManager::load_groups()
 {
-	auto load = [&](const string& path)
+	ifstream file;
+	if(fs::exists("data/groups.txt")) file.open("data/groups.txt");
+	else if(fs::exists("C:/dwarf_data/groups.txt"))file.open("C:/dwarf_data/groups.txt");
+	
+	
+	while(file)
 	{
-		ifstream file(path+"groups.txt");
-		while(file)
+		string text;
+		getline(file,text);
+		if(!is_spacefull(text))
 		{
-			string text;
-			file>>text;
-			if(!is_spacefull(text))
-			{
-				auto eq_pos = text.find("=");
-				string name = get_substr(text,0,eq_pos);
-				string val  = get_substr(text,eq_pos+1,text.size());
-				svector vals = separate_by_space(val);
+			auto eq_pos = text.find("=");
+			string name = get_substr(text,0,eq_pos);
+			string val  = get_substr(text,eq_pos+1,text.size());
+			svector vals = separate_by_space(val);
+
+			wstring_convert<codecvt_utf8_utf16<wchar_t>> converter;
+			wstring _name = converter.from_bytes(name);
 			
-				wstring_convert<codecvt_utf8_utf16<wchar_t>> converter;
-				wstring _name = converter.from_bytes(name);
-				wsvector _vals;
-				for(auto& __val: vals) _vals.push_back(converter.from_bytes(__val));
-			
-				group_pair _pair(_name,_vals);
-				groups.push_back(_pair);
-			}
+			wsvector _vals;
+			for(auto& __val: vals) _vals.push_back(converter.from_bytes(__val));
+				
+			group_pair _pair(_name,_vals);
+			groups.push_back(_pair);
 		}
-	};
-	load("data/");
-	load("C:/dwarf_data/");
+	}
 }

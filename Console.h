@@ -59,6 +59,7 @@ public:
 		R      = 114,
 		N      = 110,
 		C      = 99,
+		A      = 97,
 	};
 public:
 	Console();

@@ -133,7 +133,12 @@ void App::set_mode(int input_code)
 	previos_mode = current_mode;
 	switch(input_code)
 	{
-		case 27:exit(0);break;
+		case 27:
+		{
+			save_groups();
+			exit(0);
+		}
+		break;
 		case 49: current_mode = working_modes::MainMenu;
 		break;
 		case 50: current_mode = working_modes::List;

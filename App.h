@@ -16,8 +16,7 @@ namespace Dwarf
 {	
 class App: public SearchMenu,
 		   public ConfigLoader,
-		   public RawMusicMenu,
-		   public GroupManager
+		   public RawMusicMenu
 {
 private:	
 	enum working_modes

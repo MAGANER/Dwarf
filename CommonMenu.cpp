@@ -76,9 +76,50 @@ void CommonMenu::run_common_list(const wsvector& data,
 		--start_counter;
 	}
 	if(input == ENTER) choosen_option = current_elem;
+	if(input == A)
+	{
+		clear();
+		wstring elem_to_add = data[current_elem];
+		
+		wsvector names = get_groups_name();
+		wstring group_to_add= show_groups_to_choose(names);
+		
+		if(!group_to_add.empty())
+			add_elem_to_group(elem_to_add,group_to_add);
+	}
 	
 	draw();
 	Sleep(20);
+}
+wstring CommonMenu::show_groups_to_choose(const wsvector& groups_names)
+{
+	while(true)
+	{
+		if(!groups_names.empty())
+		{
+			wsvector _groups_names = {L"groups:"};
+			copy(groups_names.begin(),groups_names.end(),back_inserter(_groups_names));
+			
+			int min = 1;
+			int max = _groups_names.size();
+			int current = 1;
+			int current_elem = -1;
+			int choosen_option = -1;
+			
+			run_common_choosing_list(_groups_names,min,max,current,choosen_option);
+			if(current == choosen_option) 
+			{
+				return _groups_names[current];
+			}
+			if(choosen_option == -2) return L"";
+		}
+		else
+		{
+			cout<<"no groups can be used to store objects!"<<endl;
+			getch();
+			return L"";
+		}
+	}
 }
 void CommonMenu::run_common_choosing_list(const wsvector& text,
 										  int& min,
@@ -156,4 +197,38 @@ string CommonMenu::convert_wstring_to_std(const wstring& str)
 		new_str+=new_ch;
 	}
 	return new_str;
+}
+vector<wstring> CommonMenu::get_groups_name()
+{
+	vector<wstring> names; 
+	for(auto& name:groups)
+	{
+		auto exists = find(names.begin(),names.end(),name.first) != names.end();
+		if(!exists) names.push_back(name.first);
+	}
+	return names;
+}
+void CommonMenu::add_elem_to_group(const wstring& name, const wstring& group)
+{
+	if(is_group_existing(group))
+	{
+		groups[get_group_id(group)].second.push_back(name);
+	}
+}
+bool CommonMenu::is_group_existing(const wstring& name)
+{
+	for(auto& _name:groups)
+	{
+		if(_name.first == name) return true;
+	}
+	return false;	
+}
+int CommonMenu::get_group_id(const wstring& group)
+{
+	for(auto i=0;i<groups.size();++i)
+	{
+		auto curr = groups[i];
+		if(curr.first == group) return i; 
+	}
+	return -1;
 }

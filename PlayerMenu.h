@@ -6,7 +6,7 @@
 #ifndef PlayerMenu_H
 #define PlayerMenu_H
 
-#include"CommonMenu.h"
+#include"GroupManager.h"
 #include "MusicData.h"
 #include "PlayTime.h"
 
@@ -23,7 +23,7 @@ namespace Dwarf
 typedef pair<wstring,wstring> wspair;
 typedef vector<wspair> wspvector;	
 
-class PlayerMenu : public virtual CommonMenu
+class PlayerMenu : public virtual GroupManager
 {
 private:
 
