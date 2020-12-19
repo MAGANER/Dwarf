@@ -12,6 +12,9 @@ namespace Dwarf
 {
 class GroupManager : public virtual CommonMenu
 {
+protected:
+	bool play_group_elem = false;
+	wstring current_group_elem;
 private:
 	COORD main_label_pos = {35, 5};
 	COORD help1_pos = {25,15};

@@ -43,6 +43,7 @@ void GroupManager::show_groups()
 			started = true;
 			choosen_option = -1;
 		}
+		if(play_group_elem) break;
 	}
 	system("cls");
 }
@@ -72,8 +73,11 @@ void GroupManager::show_group_elements(const wsvector& elems, const wstring& gro
 		if(choosen_option == current_elem)
 		{		
 			system("cls");
+			current_group_elem = elems[current_elem];
+			play_group_elem = true;
 			started = true;
 			choosen_option = -1;
+			break;
 		}
 	}
 	system("cls");
@@ -120,6 +124,7 @@ void GroupManager::run_group_menu()
 			system("cls");
 		}
 		if(input == SPACE) show_groups();
+		if(play_group_elem) break;
 	}
 }
 string GroupManager::get_input()

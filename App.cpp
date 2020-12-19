@@ -191,7 +191,17 @@ void App::run_base_menu_list()
 		if(input == ENTER)
 		{
 			system("cls");
-			if(current == Groups) run_group_menu();
+			if(current == Groups) 
+			{
+				run_group_menu();
+				if(play_group_elem)
+				{
+					system("cls");
+					MusicData* title = get_title_path(music,current_group_elem);
+					play_raw_music(title->title,title->path);
+					play_group_elem = false;
+				}
+			}
 			if(current == Genres) run_list_genres(music);
 			if(current == Artists)run_list_artists(music,L"");
 			if(current == Albums) run_list_albums(music,L"",L"");

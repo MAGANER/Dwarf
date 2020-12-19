@@ -408,6 +408,15 @@ wstring PlayerMenu::get_genre_of_title(const vector<MusicData*>& music,
 	if(str.empty()) str = L"None";
 	return str;
 }	
+MusicData* PlayerMenu::get_title_path(const vector<MusicData*>& music,
+								   const wstring& title)
+{
+	for(auto& m:music)
+	{
+		if(m->title == title) return m;
+	}
+	return nullptr;
+}
 PlayTime* PlayerMenu::compute_time(int time)
 {
 	if(time == 0) return nullptr;
