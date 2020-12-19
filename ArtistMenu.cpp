@@ -39,6 +39,23 @@ void ArtistMenu::run_list_artists(const vector<MusicData*>& music,const wstring&
 			started = true;
 			choosen_option = -1;
 		}
+		if(add_elements_to_group)
+		{
+			wspvector whole_music = get_title_data_from_music(music,artists[current_elem],L"");
+			wsvector titles;
+			for(auto& m:whole_music) titles.push_back(m.first);
+
+			system("cls");
+			wsvector names = get_groups_name();
+			wstring group_to_add= show_groups_to_choose(names);
+			
+			if(!group_to_add.empty())
+				for(auto& t: titles) add_elem_to_group(t,group_to_add);
+			
+			add_elements_to_group = false;
+			system("cls");
+			started = true;
+		}
 	}
 	system("cls");
 }

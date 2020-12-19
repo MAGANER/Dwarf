@@ -15,7 +15,7 @@ App::App()
 	}
 	else if(fs::exists("C:/dwarf_data/config.bg"))
 	{
-	        search_path = "C:/dwarf_data/paths.txt";
+	    search_path = "C:/dwarf_data/paths.txt";
 		load_config("C:/dwarf_data/config.bg");
 	}
 	else

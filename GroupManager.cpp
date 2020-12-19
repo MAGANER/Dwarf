@@ -47,7 +47,7 @@ void GroupManager::show_groups()
 	system("cls");
 }
 void GroupManager::show_group_elements(const wsvector& elems, const wstring& group_name)
-{
+{	
 	int max_counter    = elems.size() < visible_range? elems.size():visible_range;
 	int choosen_option = -1;
 	
@@ -151,6 +151,7 @@ void GroupManager::save_groups()
 		for(auto& group:groups)
 		{
 			wstring name= group.first;
+
 			wstring val =L"="+save_group_elements(group);
 			
 			string to_save = convert_wstring_to_std(name)+convert_wstring_to_std(val);
@@ -159,6 +160,7 @@ void GroupManager::save_groups()
 		}
 		file.close();		
 	};
+
 	save("data/");
 	save("C:/dwarf_data/");
 }
@@ -184,10 +186,21 @@ void GroupManager::load_groups()
 			wstring _name = converter.from_bytes(name);
 			
 			wsvector _vals;
-			for(auto& __val: vals) _vals.push_back(converter.from_bytes(__val));
+			for(auto& __val: vals) 
+			{
+				wstring converted = converter.from_bytes(__val); 
+				auto cleared = clear_braces(converted);
+				_vals.push_back(cleared);
+			}
 				
 			group_pair _pair(_name,_vals);
 			groups.push_back(_pair);
 		}
 	}
+}
+wstring GroupManager::clear_braces(const wstring& wstr)
+{
+	wstring new_;
+	for(auto& ch: wstr) if(ch != L'(' && ch != L')') new_.push_back(ch);
+	return new_;
 }

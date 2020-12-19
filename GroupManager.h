@@ -32,6 +32,7 @@ public:
 private:
 	wstring save_group_elements(const group_pair& group);
 	void show_group_elements(const wsvector& elems,const wstring& group_name);
+	wstring clear_braces(const wstring& wstr);
 };
 };
 #endif //GROUP_MANAGER_H

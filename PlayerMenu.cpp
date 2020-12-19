@@ -285,9 +285,9 @@ void PlayerMenu::process_input()
 }
 
 void PlayerMenu::run_list_titles(const vector<MusicData*>& data,
-							 const wstring& genre,
-							 const wstring& artist, 
-							 const wstring& album)
+								 const wstring& genre,
+								 const wstring& artist, 
+								 const wstring& album)
 {
 	wspvector titles;
 	wsvector titles_only;
@@ -392,6 +392,7 @@ wspvector PlayerMenu::get_title_data_from_music(const vector<MusicData*>& music,
 	}
 	return data;	
 }
+
 wstring PlayerMenu::get_genre_of_title(const vector<MusicData*>& music,
 								   const wstring& artist, 
 								   const wstring& album,

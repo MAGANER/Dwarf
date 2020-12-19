@@ -114,11 +114,12 @@ public:
 								 const wspair& title);
 	void play_raw_music(const wstring& output_path,
 						const wstring& real_path);
-private:
+protected:
 	wspvector get_title_data_from_music(const vector<MusicData*>& music,
 										const wstring& artist, 
 										const wstring& genre);
-	wspvector get_title_data_from_music(const vector<MusicData*>& music, const wstring& album);
+	wspvector get_title_data_from_music(const vector<MusicData*>& music, const wstring& album);	
+private:
 	wstring get_genre_of_title(const vector<MusicData*>& music,
 							   const wstring& artist, 
 							   const wstring& album,

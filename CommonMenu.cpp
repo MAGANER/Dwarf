@@ -78,14 +78,7 @@ void CommonMenu::run_common_list(const wsvector& data,
 	if(input == ENTER) choosen_option = current_elem;
 	if(input == A)
 	{
-		clear();
-		wstring elem_to_add = data[current_elem];
-		
-		wsvector names = get_groups_name();
-		wstring group_to_add= show_groups_to_choose(names);
-		
-		if(!group_to_add.empty())
-			add_elem_to_group(elem_to_add,group_to_add);
+		add_elements_to_group = true;
 	}
 	
 	draw();

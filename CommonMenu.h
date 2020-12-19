@@ -17,15 +17,18 @@ class CommonMenu: public Console
 protected:
 	Color standart, green_label, red_label, empty, magenta_label;
 	const int visible_range = 28;
+	bool add_elements_to_group = false;
 	
 	vector<group_pair> groups;
 	vector<wstring> get_groups_name();
-	void add_elem_to_group(const wstring& name, const wstring& group);
-	bool is_group_existing(const wstring& name);
-	int get_group_id(const wstring& group);
 protected:
 	bool can_wstring_be_converted_to_std(const wstring& str);
 	string convert_wstring_to_std(const wstring& str);
+	
+	
+	void add_elem_to_group(const wstring& name, const wstring& group);
+	bool is_group_existing(const wstring& name);
+	int get_group_id(const wstring& group);
 public:
 	CommonMenu();
 	virtual ~CommonMenu();
