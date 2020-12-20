@@ -119,8 +119,6 @@ protected:
 										const wstring& artist, 
 										const wstring& genre);
 	wspvector get_title_data_from_music(const vector<MusicData*>& music, const wstring& album);
-	MusicData* get_title_path(const vector<MusicData*>& music,
-							  const wstring& title);
 private:
 	wstring get_genre_of_title(const vector<MusicData*>& music,
 							   const wstring& artist, 

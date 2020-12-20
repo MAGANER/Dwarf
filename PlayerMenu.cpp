@@ -56,6 +56,7 @@ void PlayerMenu::run_playing_composition(const vector<MusicData*>& _music,
 	
 	can_play_next = current_play_list_pos+1 < current_play_list.size();
 	draw_there_is_no_ability_to_play();
+	
 	while(!stop && audio_init)
 	{
 		bool not_out_of_playlist = current_play_list_pos < current_play_list.size(); 
@@ -408,15 +409,6 @@ wstring PlayerMenu::get_genre_of_title(const vector<MusicData*>& music,
 	if(str.empty()) str = L"None";
 	return str;
 }	
-MusicData* PlayerMenu::get_title_path(const vector<MusicData*>& music,
-								   const wstring& title)
-{
-	for(auto& m:music)
-	{
-		if(m->title == title) return m;
-	}
-	return nullptr;
-}
 PlayTime* PlayerMenu::compute_time(int time)
 {
 	if(time == 0) return nullptr;

@@ -39,6 +39,7 @@ void GroupManager::show_groups()
 		if(choosen_option == current_elem)
 		{		
 			system("cls");
+			current_group = this->groups[current_elem].first;
 			show_group_elements(this->groups[current_elem].second,this->groups[current_elem].first);
 			started = true;
 			choosen_option = -1;
@@ -208,4 +209,38 @@ wstring GroupManager::clear_braces(const wstring& wstr)
 	wstring new_;
 	for(auto& ch: wstr) if(ch != L'(' && ch != L')') new_.push_back(ch);
 	return new_;
+}
+wspvector GroupManager::make_playlist(const vector<MusicData*>& music,
+									  const wstring& group_name)
+{
+	int group_id = get_group_id(group_name);
+	group_pair current_group = groups[group_id];
+
+
+	wspvector elements;
+	for(auto& title:current_group.second)
+	{
+		MusicData* data = get_title_path(music,title);
+		wspair _data(data->title,data->path);
+		elements.push_back(_data);
+	}
+	return elements;
+}
+MusicData* GroupManager::get_title_path(const vector<MusicData*>& music,
+										const wstring& title)
+{
+	for(auto& m:music)
+	{
+		if(m->title == title) return m;
+	}
+	return nullptr;
+}
+int GroupManager::get_current_group_elem_id(const wspvector& current_play_list)
+{
+	for(int i = 0;i<current_play_list.size();++i)
+	{
+		auto s = current_play_list[i];
+		if(s.first == current_group_elem) return i; 
+	}
+	return -1;
 }

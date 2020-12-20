@@ -196,9 +196,12 @@ void App::run_base_menu_list()
 				run_group_menu();
 				if(play_group_elem)
 				{
-					system("cls");
-					MusicData* title = get_title_path(music,current_group_elem);
-					play_raw_music(title->title,title->path);
+					current_play_list = make_playlist(music,current_group);
+					current_play_list_pos = get_current_group_elem_id(current_play_list);
+					wspair data = current_play_list[current_play_list_pos];
+					MusicData* _data = get_title_path(music,data.first);
+					wspair titlepath(_data->title,_data->path);
+					run_playing_composition(music,_data->artist,_data->album,titlepath);
 					play_group_elem = false;
 				}
 			}
