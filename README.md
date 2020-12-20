@@ -13,7 +13,7 @@ Supported formats: mp3.
 Here i show you what is done and what is going to be done.
 - [x] Make basical player application(sorting, loading, playing).
 - [x] Make searching.
-- [ ] Make groups(extended playlists).
+- [x] Make groups(extended playlists).
 - [ ] Make GUI.
 - [ ] Make full support for Unicode in Console.
 - [x] Make ability to see 'raw' music(that has no tags)
