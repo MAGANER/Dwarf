@@ -14,7 +14,6 @@ Here i show you what is done and what is going to be done.
 - [x] Make basical player application(sorting, loading, playing).
 - [x] Make searching.
 - [x] Make groups(extended playlists).
-- [ ] Make GUI.
 - [ ] Make full support for Unicode in Console.
 - [x] Make ability to see 'raw' music(that has no tags)
 - [x] Make it able to play music, passed as command line argument
